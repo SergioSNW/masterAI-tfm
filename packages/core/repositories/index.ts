@@ -1,0 +1,6 @@
+export type { IActorRepository } from './IActorRepository'
+export type { IDirectorRepository } from './IDirectorRepository'
+export type { IProjectRepository } from './IProjectRepository'
+export type { ICastingRepository } from './ICastingRepository'
+export type { IRoundRepository } from './IRoundRepository'
+export type { ISubmissionRepository } from './ISubmissionRepository'
