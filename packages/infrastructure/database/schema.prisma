@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Actor {
+  id               String       @id @default(uuid())
+  email            String       @unique
+  name             String
+  profilePictureUrl String?
+  phone            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  submissions Submission[]
+}
+
+model Director {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  company   String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  projects Project[]
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  directorId  String
+  title       String
+  description String?
+  status      String    @default("draft")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  director Director @relation(fields: [directorId], references: [id])
+  castings Casting[]
+}
+
+model Casting {
+  id           String   @id @default(uuid())
+  projectId    String
+  roleName     String
+  description  String?
+  requirements String?
+  status       String   @default("open")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+  rounds  Round[]
+}
+
+model Round {
+  id          String       @id @default(uuid())
+  castingId   String
+  name        String
+  description String?
+  deadline    DateTime?
+  order       Int
+  status      String       @default("pending")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  casting     Casting      @relation(fields: [castingId], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id           String   @id @default(uuid())
+  roundId      String
+  actorId      String
+  videoUrl     String
+  thumbnailUrl String?
+  notes        String?
+  status       String   @default("pending")
+  feedback     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  round Round @relation(fields: [roundId], references: [id])
+  actor Actor @relation(fields: [actorId], references: [id])
+}

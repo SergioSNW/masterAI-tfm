@@ -1,0 +1,16 @@
+{
+  "name": "masterai-tfm",
+  "private": true,
+  "workspaces": [
+    "packages/core",
+    "packages/infrastructure",
+    "api"
+  ],
+  "scripts": {
+    "prisma:generate": "npm run prisma:generate -w packages/infrastructure",
+    "prisma:migrate": "npm run prisma:migrate -w packages/infrastructure"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

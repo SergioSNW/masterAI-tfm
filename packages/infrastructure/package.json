@@ -1,0 +1,22 @@
+{
+  "name": "@masterai/infrastructure",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "prisma:generate": "prisma generate --schema=./database/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema=./database/schema.prisma",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@masterai/core": "*",
+    "@prisma/client": "^6.1.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.1.0",
+    "typescript": "^5.7.0"
+  }
+}

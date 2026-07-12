@@ -1,0 +1,6 @@
+export { PrismaActorRepository } from './PrismaActorRepository'
+export { PrismaDirectorRepository } from './PrismaDirectorRepository'
+export { PrismaProjectRepository } from './PrismaProjectRepository'
+export { PrismaCastingRepository } from './PrismaCastingRepository'
+export { PrismaRoundRepository } from './PrismaRoundRepository'
+export { PrismaSubmissionRepository } from './PrismaSubmissionRepository'
