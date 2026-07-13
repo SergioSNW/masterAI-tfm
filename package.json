@@ -10,7 +10,8 @@
   "scripts": {
     "prisma:generate": "npm run prisma:generate -w packages/infrastructure",
     "prisma:migrate": "npm run prisma:migrate -w packages/infrastructure",
-    "dev:web": "npm run dev -w apps/web"
+    "dev:web": "npm run dev -w apps/web",
+    "build:web": "npm run build -w apps/web"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

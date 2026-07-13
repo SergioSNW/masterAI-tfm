@@ -73,9 +73,9 @@ export const mockProjects: Project[] = [
             status: 'open',
             submissions: [
               { id: 's1', actorId: 'a1', actorName: 'Emma Richardson', actorEmail: 'emma.r@example.com', avatarColor: '#6366f1', videoUrl: '#', notes: 'Strong emotional range', status: 'shortlisted', feedback: 'Excellent presence. Moving to callbacks.', createdAt: '2026-07-10' },
-              { id: 's2', actorId: 'a2', actorName: 'James Whitfield', actorEmail: 'james.w@example.com', avatarColor: '#a855f7', videoUrl: '#', notes: null, status: 'pending', createdAt: '2026-07-11' },
+              { id: 's2', actorId: 'a2', actorName: 'James Whitfield', actorEmail: 'james.w@example.com', avatarColor: '#a855f7', videoUrl: '#', status: 'pending', createdAt: '2026-07-11' },
               { id: 's3', actorId: 'a3', actorName: 'Sophia Chen', actorEmail: 'sophia.c@example.com', avatarColor: '#ec4899', videoUrl: '#', notes: 'Good diction but needs more depth', status: 'reviewed', createdAt: '2026-07-09' },
-              { id: 's4', actorId: 'a4', actorName: 'Oliver Grant', actorEmail: 'oliver.g@example.com', avatarColor: '#22c55e', videoUrl: '#', notes: null, status: 'pending', createdAt: '2026-07-12' },
+              { id: 's4', actorId: 'a4', actorName: 'Oliver Grant', actorEmail: 'oliver.g@example.com', avatarColor: '#22c55e', videoUrl: '#', status: 'pending', createdAt: '2026-07-12' },
             ],
           },
           {
@@ -107,7 +107,7 @@ export const mockProjects: Project[] = [
             order: 0,
             status: 'open',
             submissions: [
-              { id: 's5', actorId: 'a5', actorName: 'Diana Moss', actorEmail: 'diana.m@example.com', avatarColor: '#eab308', videoUrl: '#', notes: null, status: 'pending', createdAt: '2026-07-11' },
+              { id: 's5', actorId: 'a5', actorName: 'Diana Moss', actorEmail: 'diana.m@example.com', avatarColor: '#eab308', videoUrl: '#', status: 'pending', createdAt: '2026-07-11' },
             ],
           },
         ],
@@ -138,7 +138,7 @@ export const mockProjects: Project[] = [
             status: 'open',
             submissions: [
               { id: 's6', actorId: 'a6', actorName: 'Marcus Johnson', actorEmail: 'marcus.j@example.com', avatarColor: '#6366f1', videoUrl: '#', notes: 'Intense performance, very compelling', status: 'shortlisted', feedback: 'Great intensity. Moving to next round.', createdAt: '2026-07-08' },
-              { id: 's7', actorId: 'a7', actorName: 'Lena Fischer', actorEmail: 'lena.f@example.com', avatarColor: '#a855f7', videoUrl: '#', notes: null, status: 'pending', createdAt: '2026-07-12' },
+              { id: 's7', actorId: 'a7', actorName: 'Lena Fischer', actorEmail: 'lena.f@example.com', avatarColor: '#a855f7', videoUrl: '#', status: 'pending', createdAt: '2026-07-12' },
             ],
           },
         ],

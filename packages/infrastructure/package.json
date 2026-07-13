@@ -6,6 +6,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
+    "postinstall": "prisma generate --schema=./database/schema.prisma",
     "prisma:generate": "prisma generate --schema=./database/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema=./database/schema.prisma",
     "typecheck": "tsc --noEmit"

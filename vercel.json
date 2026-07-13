@@ -3,5 +3,11 @@
     "api/**/*.ts": {
       "maxDuration": 10
     }
-  }
+  },
+  "buildCommand": "npm run build:web",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }
