@@ -17,6 +17,11 @@ export type { OpenRoundDTO } from './rounds/OpenRoundUseCase'
 export { CloseRoundUseCase } from './rounds/CloseRoundUseCase'
 export type { CloseRoundDTO } from './rounds/CloseRoundUseCase'
 
+export { CreateActorUseCase } from './actors/CreateActorUseCase'
+export type { CreateActorDTO } from './actors/CreateActorUseCase'
+export { ListActorsUseCase } from './actors/ListActorsUseCase'
+export type { ListActorsDTO } from './actors/ListActorsUseCase'
+
 export { SubmitVideoUseCase } from './submissions/SubmitVideoUseCase'
 export type { SubmitVideoDTO } from './submissions/SubmitVideoUseCase'
 export { ReviewSubmissionUseCase } from './submissions/ReviewSubmissionUseCase'

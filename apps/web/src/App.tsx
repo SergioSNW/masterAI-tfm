@@ -4,6 +4,7 @@ import { ProjectsView } from './views/ProjectsView'
 import { ProjectDetailView } from './views/ProjectDetailView'
 import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
+import { ActorsView } from './views/ActorsView'
 
 export default function App() {
   const { route, navigate } = useHashRoute()
@@ -29,6 +30,8 @@ export default function App() {
         return round
           ? <RoundDetailView round={round} onBack={() => navigate(`casting/${round.castingId}`)} />
           : <EmptyState />
+      case 'actors':
+        return <ActorsView />
       default:
         return <ProjectsView projects={mockProjects} onProjectClick={(id) => navigate(`project/${id}`)} />
     }
@@ -47,7 +50,7 @@ export default function App() {
         <button className={`nav-item ${view === 'projects' ? 'active' : ''}`} onClick={() => navigate('projects')}>
           <span>🎬</span> Projects
         </button>
-        <button className="nav-item">
+        <button className={`nav-item ${view === 'actors' ? 'active' : ''}`} onClick={() => navigate('actors')}>
           <span>👥</span> Actors
         </button>
         <button className="nav-item">

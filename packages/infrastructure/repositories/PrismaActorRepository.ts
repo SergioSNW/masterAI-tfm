@@ -11,6 +11,21 @@ export class PrismaActorRepository implements IActorRepository {
     return prisma.actor.findUnique({ where: { email } }) as Promise<Actor | null>
   }
 
+  async findMany(search?: string): Promise<Actor[]> {
+    if (search) {
+      return prisma.actor.findMany({
+        where: {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+          ],
+        },
+        orderBy: { name: 'asc' },
+      }) as Promise<Actor[]>
+    }
+    return prisma.actor.findMany({ orderBy: { name: 'asc' } }) as Promise<Actor[]>
+  }
+
   async create(actor: Actor): Promise<Actor> {
     return prisma.actor.create({ data: actor }) as Promise<Actor>
   }
