@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { SubmitVideoSchema } from '@masterai/infrastructure'
-import { SubmitVideoUseCase } from '@masterai/core'
+import { ManualUploadSchema } from '@masterai/infrastructure'
+import { ManualUploadUseCase } from '@masterai/core'
 import {
   PrismaSubmissionRepository,
   PrismaRoundRepository,
@@ -12,12 +12,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const parsed = SubmitVideoSchema.safeParse(req.body)
+  const parsed = ManualUploadSchema.safeParse(req.body)
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() })
   }
 
-  const useCase = new SubmitVideoUseCase(
+  const useCase = new ManualUploadUseCase(
     new PrismaSubmissionRepository(),
     new PrismaRoundRepository(),
     new PrismaActorRepository(),

@@ -8,6 +8,14 @@ export const SubmitVideoSchema = z.object({
   notes: z.string().max(2000).optional(),
 })
 
+export const ManualUploadSchema = z.object({
+  roundId: z.string().uuid(),
+  actorId: z.string().uuid(),
+  videoData: z.string().min(1, 'Video data is required'),
+  fileName: z.string().min(1, 'File name is required').max(200),
+  notes: z.string().max(2000).optional(),
+})
+
 export const ReviewSubmissionSchema = z.object({
   submissionId: z.string().uuid(),
   status: z.enum(['reviewed', 'shortlisted', 'rejected']),

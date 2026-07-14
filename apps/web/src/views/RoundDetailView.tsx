@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Round, Submission } from '../data/mock'
+import { UploadVideoModal } from '../components/UploadVideoModal'
 
 interface Props {
   round: Round
@@ -9,6 +10,7 @@ interface Props {
 export function RoundDetailView({ round, onBack }: Props) {
   const [selected, setSelected] = useState<Submission | null>(null)
   const [feedback, setFeedback] = useState('')
+  const [showUpload, setShowUpload] = useState(false)
 
   const statusCounts = {
     total: round.submissions.length,
@@ -29,6 +31,11 @@ export function RoundDetailView({ round, onBack }: Props) {
         </div>
         <div className="detail-header-right">
           <span className={`badge badge-${round.status}`}>{round.status}</span>
+          {round.status === 'open' && (
+            <button className="btn btn-primary" onClick={() => setShowUpload(true)}>
+              + Upload Video
+            </button>
+          )}
         </div>
       </div>
 
@@ -72,7 +79,7 @@ export function RoundDetailView({ round, onBack }: Props) {
         {round.submissions.length === 0 && (
           <div className="empty-state">
             <h3>No submissions yet</h3>
-            <p>Waiting for actors to submit their auditions.</p>
+            <p>Upload a video to get started.</p>
           </div>
         )}
       </div>
@@ -85,7 +92,13 @@ export function RoundDetailView({ round, onBack }: Props) {
               <button className="modal-close" onClick={() => setSelected(null)}>×</button>
             </div>
 
-            <div className="video-placeholder">🎬</div>
+            {selected.videoUrl.startsWith('data:') ? (
+              <video controls style={{ width: '100%', borderRadius: 'var(--radius-md)', marginBottom: 16, maxHeight: 360 }} src={selected.videoUrl}>
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div className="video-placeholder">🎬</div>
+            )}
 
             <div className="detail-row"><strong>Email</strong><span>{selected.actorEmail}</span></div>
             <div className="detail-row"><strong>Status</strong><span className={`badge badge-${selected.status === 'reviewed' ? 'active' : selected.status}`}>{selected.status}</span></div>
@@ -99,34 +112,29 @@ export function RoundDetailView({ round, onBack }: Props) {
                 onChange={e => setFeedback(e.target.value)}
                 placeholder="Write your feedback..."
                 style={{
-                  width: '100%',
-                  padding: 12,
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'var(--glass-bg)',
-                  border: '1px solid var(--glass-border)',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font)',
-                  fontSize: 14,
-                  resize: 'vertical',
-                  minHeight: 80,
-                  outline: 'none',
+                  width: '100%', padding: 12, borderRadius: 'var(--radius-sm)',
+                  background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+                  color: 'var(--text-primary)', fontFamily: 'var(--font)', fontSize: 14,
+                  resize: 'vertical', minHeight: 80, outline: 'none',
                 }}
               />
             </div>
 
             <div className="action-buttons">
-              <button className="btn btn-primary" onClick={() => {
-                setSelected(null)
-              }}>Shortlist</button>
-              <button className="btn btn-ghost" onClick={() => {
-                setSelected(null)
-              }}>Mark Reviewed</button>
-              <button className="btn btn-ghost" style={{ marginLeft: 'auto', color: 'var(--danger)' }} onClick={() => {
-                setSelected(null)
-              }}>Reject</button>
+              <button className="btn btn-primary" onClick={() => setSelected(null)}>Shortlist</button>
+              <button className="btn btn-ghost" onClick={() => setSelected(null)}>Mark Reviewed</button>
+              <button className="btn btn-ghost" style={{ marginLeft: 'auto', color: 'var(--danger)' }} onClick={() => setSelected(null)}>Reject</button>
             </div>
           </div>
         </div>
+      )}
+
+      {showUpload && (
+        <UploadVideoModal
+          roundId={round.id}
+          onClose={() => setShowUpload(false)}
+          onSuccess={() => {}}
+        />
       )}
     </div>
   )

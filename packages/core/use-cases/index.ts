@@ -24,5 +24,7 @@ export type { ListActorsDTO } from './actors/ListActorsUseCase'
 
 export { SubmitVideoUseCase } from './submissions/SubmitVideoUseCase'
 export type { SubmitVideoDTO } from './submissions/SubmitVideoUseCase'
+export { ManualUploadUseCase } from './submissions/ManualUploadUseCase'
+export type { ManualUploadDTO } from './submissions/ManualUploadUseCase'
 export { ReviewSubmissionUseCase } from './submissions/ReviewSubmissionUseCase'
 export type { ReviewSubmissionDTO } from './submissions/ReviewSubmissionUseCase'
