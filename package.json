@@ -5,19 +5,23 @@
     "packages/core",
     "packages/infrastructure",
     "api",
-    "apps/web"
+    "apps/web",
+    "apps/mobile"
   ],
   "scripts": {
     "prisma:generate": "npm run prisma:generate -w packages/infrastructure",
     "prisma:migrate": "npm run prisma:migrate -w packages/infrastructure",
     "dev:web": "npm run dev -w apps/web",
     "build:web": "npm run build -w apps/web",
+    "dev:mobile": "npm run start -w apps/mobile",
+    "dev:mobile:web": "npm run web -w apps/mobile",
     "test": "npm run test -w packages/core && npm run test -w packages/infrastructure && npm run test -w apps/web",
     "test:core": "npm run test -w packages/core",
     "test:infra": "npm run test -w packages/infrastructure",
     "test:web": "npm run test -w apps/web"
   },
   "devDependencies": {
+    "expo-router": "~4.0.0",
     "typescript": "^5.7.0"
   }
 }

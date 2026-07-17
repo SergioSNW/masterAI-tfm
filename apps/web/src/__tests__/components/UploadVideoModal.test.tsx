@@ -13,8 +13,8 @@ vi.mock('../../services/submissionService', () => ({
 }))
 
 const mockActors = [
-  { id: '1', name: 'Alice Wonder', email: 'alice@test.com' },
-  { id: '2', name: 'Bob Builder', email: 'bob@test.com' },
+  { id: '1', name: 'Alice Wonder', email: 'alice@test.com', createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '2', name: 'Bob Builder', email: 'bob@test.com', createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z' },
 ]
 
 describe('UploadVideoModal', () => {
