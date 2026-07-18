@@ -8,6 +8,7 @@ const MOCK_CASTINGS: CastingDTO[] = [
     role: 'Lead Actor',
     deadline: 'Aug 15, 2026',
     status: 'open',
+    roundId: 'r1',
     submission: {
       status: 'shortlisted',
       feedback: 'Excellent presence and emotional range. Moving to callbacks.',
@@ -21,6 +22,7 @@ const MOCK_CASTINGS: CastingDTO[] = [
     role: 'Supporting Actor',
     deadline: 'Aug 30, 2026',
     status: 'open',
+    roundId: 'r2',
     submission: {
       status: 'pending',
       submittedAt: 'Jul 14, 2026',
@@ -33,6 +35,7 @@ const MOCK_CASTINGS: CastingDTO[] = [
     role: 'Voice Actor',
     deadline: 'Sep 1, 2026',
     status: 'open',
+    roundId: 'r3',
   },
 ]
 

@@ -5,6 +5,7 @@ export interface CastingDTO {
   role: string
   deadline: string
   status: string
+  roundId?: string
   submission?: {
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | null
     feedback?: string

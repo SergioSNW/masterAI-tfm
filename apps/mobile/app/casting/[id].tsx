@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, radii, spacing } from '../../src/theme/colors'
 import { GlassButton } from '../../src/components/GlassButton'
 import { GlassCard } from '../../src/components/GlassCard'
 import { fetchOpenCastings } from '../../src/services/castingService'
+import { submitVideo, readFileAsBase64 } from '../../src/services/submissionService'
 import type { CastingDTO } from '../../src/services/types'
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
@@ -19,6 +20,9 @@ export default function CastingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [casting, setCasting] = useState<CastingDTO | null>(null)
   const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [localSubmission, setLocalSubmission] = useState<{ status: string; feedback?: string; submittedAt: string } | null>(null)
 
   useEffect(() => {
     fetchOpenCastings().then(all => {
@@ -26,6 +30,35 @@ export default function CastingDetail() {
       setLoading(false)
     })
   }, [id])
+
+  async function handleFilePick() {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'video/mp4,video/quicktime,video/webm'
+      input.onchange = async (e: Event) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file || !casting) return
+        await doUpload(file)
+      }
+      input.click()
+    }
+  }
+
+  async function doUpload(file: File) {
+    if (!casting) return
+    setUploading(true)
+    setUploadError(null)
+    try {
+      const videoData = await readFileAsBase64(file)
+      const result = await submitVideo(casting, videoData, file.name)
+      setLocalSubmission({ status: result.status, feedback: result.feedback, submittedAt: result.submittedAt })
+    } catch {
+      setUploadError('Upload failed. Check your connection and try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -46,7 +79,8 @@ export default function CastingDetail() {
     )
   }
 
-  const meta = casting.submission ? STATUS_META[casting.submission.status ?? ''] : null
+  const submission = localSubmission ?? casting.submission
+  const meta = submission ? STATUS_META[submission.status ?? ''] : null
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -69,24 +103,24 @@ export default function CastingDetail() {
           </View>
         </GlassCard>
 
-        {casting.submission ? (
+        {submission ? (
           <GlassCard style={{ marginTop: spacing.md }}>
             <Text style={styles.sectionTitle}>Your Submission</Text>
             <View style={[styles.badge, { backgroundColor: meta ? meta.color + '22' : 'transparent', borderColor: meta ? meta.color : 'transparent' }]}>
               <Text style={[styles.badgeText, { color: meta?.color }]}>
-                {meta?.label ?? casting.submission.status}
+                {meta?.label ?? submission.status}
               </Text>
             </View>
-            {casting.submission.submittedAt && (
+            {submission.submittedAt && (
               <View style={styles.metaRow}>
                 <Text style={styles.metaLabel}>Submitted</Text>
-                <Text style={styles.metaValue}>{casting.submission.submittedAt}</Text>
+                <Text style={styles.metaValue}>{submission.submittedAt}</Text>
               </View>
             )}
-            {casting.submission.feedback && (
+            {submission.feedback && (
               <View style={{ marginTop: spacing.md }}>
                 <Text style={styles.metaLabel}>Feedback</Text>
-                <Text style={styles.feedback}>{casting.submission.feedback}</Text>
+                <Text style={styles.feedback}>{submission.feedback}</Text>
               </View>
             )}
           </GlassCard>
@@ -94,6 +128,18 @@ export default function CastingDetail() {
           <GlassCard style={{ marginTop: spacing.md }}>
             <Text style={styles.sectionTitle}>Not Submitted</Text>
             <Text style={styles.subtitle}>You haven't submitted for this role yet.</Text>
+            {casting.status === 'open' && (
+              <GlassButton
+                title={uploading ? 'Uploading...' : 'Submit Video'}
+                onPress={handleFilePick}
+                variant="primary"
+                disabled={uploading}
+                style={{ marginTop: spacing.md }}
+              />
+            )}
+            {uploadError && (
+              <Text style={{ color: '#ef4444', fontSize: 13, marginTop: spacing.sm }}>{uploadError}</Text>
+            )}
           </GlassCard>
         )}
       </ScrollView>
