@@ -8,6 +8,7 @@ import { RoundDetailView } from './views/RoundDetailView'
 import { ActorsView } from './views/ActorsView'
 import { SettingsView } from './views/SettingsView'
 import { DocsView } from './views/DocsView'
+import { HelpView } from './views/HelpView'
 import { createProject } from './services/projectService'
 import { getProfile } from './services/profileService'
 import type { CreateProjectInput } from './services/projectService'
@@ -67,6 +68,8 @@ export default function App() {
         return <SettingsView />
       case 'docs':
         return <DocsView />
+      case 'help':
+        return <HelpView />
       default:
         return <ProjectsView projects={projects} onProjectClick={(id) => navigate(`project/${id}`)} onProjectCreate={handleProjectCreate} />
     }
@@ -90,6 +93,9 @@ export default function App() {
         </button>
         <button className={`nav-item ${view === 'docs' ? 'active' : ''}`} onClick={() => navigate('docs')}>
           <span>📖</span> Docs
+        </button>
+        <button className={`nav-item ${view === 'help' ? 'active' : ''}`} onClick={() => navigate('help')}>
+          <span>❓</span> Help
         </button>
         <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => navigate('settings')}>
           <span>⚙️</span> Settings

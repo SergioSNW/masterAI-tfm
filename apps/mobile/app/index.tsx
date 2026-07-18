@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useWindowDimensions, View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
+import { useWindowDimensions, View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import { colors, radii, spacing } from '../src/theme/colors'
@@ -51,15 +51,22 @@ export default function Dashboard() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {narrow ? (
           <View style={styles.headerStack}>
-            <Text style={styles.logo}>MasterAI</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.logo}>MasterAI</Text>
+              <TouchableOpacity onPress={() => router.push('/guide')} style={styles.helpBtn}>
+                <Text style={styles.helpBtnText}>❓</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.welcome}>Welcome to your actor dashboard</Text>
             <AvatarChip name="Alex Rivera" onPress={() => setProfileVisible(true)} />
           </View>
         ) : (
           <View style={styles.headerRow}>
-            <View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <Text style={styles.logo}>MasterAI</Text>
-              <Text style={styles.welcome}>Welcome to your actor dashboard</Text>
+              <TouchableOpacity onPress={() => router.push('/guide')} style={styles.helpBtn}>
+                <Text style={styles.helpBtnText}>❓</Text>
+              </TouchableOpacity>
             </View>
             <AvatarChip name="Alex Rivera" onPress={() => setProfileVisible(true)} />
           </View>
@@ -157,6 +164,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.tertiary,
     textAlign: 'center',
+  },
+  helpBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.glass.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.glass.border,
+  },
+  helpBtnText: {
+    fontSize: 15,
   },
 })
 
