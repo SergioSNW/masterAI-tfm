@@ -71,6 +71,7 @@ model Round {
 
   casting     Casting      @relation(fields: [castingId], references: [id])
   submissions Submission[]
+  attachments Attachment[]
 }
 
 model Submission {
@@ -87,4 +88,30 @@ model Submission {
 
   round Round @relation(fields: [roundId], references: [id])
   actor Actor @relation(fields: [actorId], references: [id])
+
+  comments Comment[]
+}
+
+model Comment {
+  id           String   @id @default(uuid())
+  submissionId String
+  authorName   String
+  content      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  roundId   String
+  fileName  String
+  fileType  String
+  fileData  String
+  fileSize  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  round Round @relation(fields: [roundId], references: [id])
 }

@@ -65,6 +65,7 @@ export function HelpView() {
             ['Marking as reviewed', `A neutral review status. Use this when you've watched the submission but haven't decided yet.`],
             ['Rejecting', 'Marks the submission with a red badge. The actor will see the rejection status and any feedback you provided.'],
             ['Stats bar', 'The stats bar at the top shows counts for Total, Pending, Shortlisted, Reviewed, and Rejected — updated in real time as you review.'],
+            ['Internal comments', 'Use the Comments section in the review modal to leave internal notes visible to your team. Comments persist alongside the submission and are loaded each time you open the modal.'],
           ]} />
         </HelpSection>
 
@@ -85,6 +86,16 @@ export function HelpView() {
             ['Upload flow', 'Open a round and click "+ Upload Video". Select an actor from the dropdown, choose a video file (.mp4, .mov, .webm), and add optional notes.'],
             ['File size limit', 'The system enforces a 5MB limit for uploads. Files are encoded as Base64 and stored in the database.'],
             ['Video preview', 'After upload, the video can be played directly in the review modal.'],
+          ]} />
+        </HelpSection>
+
+        {/* ── Attachments ── */}
+        <HelpSection title="Round Attachments">
+          <p>Attach scripts, contracts, or reference materials to any round. Actors can view and download these files from the mobile app.</p>
+          <FeatureList items={[
+            ['Adding an attachment', 'Open a round and click "+ Upload File" in the Attachments section. Select a PDF, image, or text file. The 10MB limit applies.'],
+            ['Supported formats', 'PDF documents, PNG/JPEG images, and plain text files are supported. Files are stored as Base64 in the database.'],
+            ['Downloading', 'Each attachment has a Download button. Click it to save the file locally. Actors see an "Open" button in their app.'],
           ]} />
         </HelpSection>
 

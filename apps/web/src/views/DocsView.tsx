@@ -22,15 +22,15 @@ export function DocsView() {
           <TwoCol>
             <TechCard icon="⚛️" title="Frontend (Director)" items={['React 19 + Vite', 'TypeScript strict', 'Hash-based SPA routing', 'visionOS glass design']} />
             <TechCard icon="📱" title="Frontend (Actor)" items={['Expo SDK 52', 'React Native + expo-router', 'Same glass design system', 'Compiles to web + native']} />
-            <TechCard icon="⚡" title="Backend" items={['Vercel Serverless Functions', '11 API endpoints (REST)', 'Zod validation on all inputs', '10s max duration']} />
-            <TechCard icon="🗄️" title="Data" items={['Neon.tech PostgreSQL', 'Prisma ORM (6 models)', 'Base64 video in bytea columns', 'Connection pooling via pgBouncer']} />
+            <TechCard icon="⚡" title="Backend" items={['Vercel Serverless Functions', '15 API endpoints (REST)', 'Zod validation on all inputs', '10s max duration']} />
+            <TechCard icon="🗄️" title="Data" items={['Neon.tech PostgreSQL', 'Prisma ORM (8 models)', 'Base64 video in bytea columns', 'Connection pooling via pgBouncer']} />
             <TechCard icon="🔧" title="Infrastructure" items={['npm workspaces monorepo', '7 packages across 4 layers', 'n8n for workflow orchestration', 'Vercel + GitHub CI']} />
           </TwoCol>
         </Section>
 
         {/* ── Data Model ── */}
         <Section title="Data Model">
-          <p style={{ marginBottom: 16 }}>Six models form the core schema. The relationship chain is: <strong>Director → Project → Casting → Round → Submission ↔ Actor</strong></p>
+          <p style={{ marginBottom: 16 }}>Eight models form the core schema: <strong>Director → Project → Casting → Round</strong> (with <strong>Attachment</strong>) <strong>→ Submission</strong> (with <strong>Comment</strong>) <strong>↔ Actor</strong></p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <ERDTable name="Director" fields={['id (UUID, PK)', 'email (unique)', 'name', 'company?', 'phone?', 'timestamps']} color="#6366f1" />
             <ERDArrow />
@@ -40,7 +40,11 @@ export function DocsView() {
             <ERDArrow />
             <ERDTable name="Round" fields={['id (UUID, PK)', 'castingId (FK → Casting)', 'name', 'description?', 'deadline?', 'order (int)', 'status (pending|open|closed)', 'timestamps']} color="#22c55e" />
             <ERDArrow />
+            <ERDTable name="Attachment" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'fileName', 'fileType', 'fileData (Base64)', 'fileSize (int)', 'timestamps']} color="#eab308" />
+            <ERDArrow style={{ opacity: 0.3 }} />
             <ERDTable name="Submission" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'actorId (FK → Actor)', 'videoUrl (bytea as Base64)', 'thumbnailUrl?', 'notes?', 'status (pending|reviewed|shortlisted|rejected)', 'feedback?', 'timestamps']} color="#eab308" />
+            <ERDArrow style={{ opacity: 0.3 }} />
+            <ERDTable name="Comment" fields={['id (UUID, PK)', 'submissionId (FK → Submission)', 'authorName', 'content', 'timestamps']} color="#a855f7" />
             <ERDArrow style={{ opacity: 0.3 }} />
             <ERDTable name="Actor" fields={['id (UUID, PK)', 'email (unique)', 'name', 'profilePictureUrl?', 'phone?', 'timestamps']} color="#6366f1" />
           </div>
@@ -59,15 +63,19 @@ export function DocsView() {
           <Endpoint method="POST" path="/api/rounds/open" desc="Open a pending round." />
           <Endpoint method="POST" path="/api/rounds/close" desc="Close an open round." />
           <Endpoint method="POST" path="/api/submissions/upload" desc="Manual video upload. Base64, max 5MB, .mp4/.mov/.webm only." />
-          <Endpoint method="POST" path="/api/submissions/review" desc="Review a submission. Status can be reviewed, shortlisted, or rejected." />
+           <Endpoint method="POST" path="/api/submissions/review" desc="Review a submission. Status can be reviewed, shortlisted, or rejected." />
+           <Endpoint method="POST" path="/api/submissions/comment" desc="Add a comment to a submission. Author name and content are required." />
+           <Endpoint method="GET" path="/api/submissions/comments" desc="List comments for a submission. Query: ?submissionId=" />
+           <Endpoint method="POST" path="/api/rounds/attachment" desc="Upload a file attachment to a round. Base64, max 10MB." />
+           <Endpoint method="GET" path="/api/rounds/attachments" desc="List attachments for a round. Query: ?roundId=" />
         </Section>
 
         {/* ── Clean Architecture ── */}
         <Section title="Clean Architecture Layers">
           <TwoCol>
-            <TechCard icon="📦" title="Core (packages/core)" items={['Entity interfaces (6 types)', 'Use case classes (12)', 'Repository interfaces (6)', 'Result<T> discriminated union', 'Zero external dependencies']} />
+            <TechCard icon="📦" title="Core (packages/core)" items={['Entity interfaces (8 types)', 'Use case classes (16)', 'Repository interfaces (8)', 'Result<T> discriminated union', 'Zero external dependencies']} />
             <TechCard icon="🔌" title="Infrastructure (packages/infrastructure)" items={['Prisma schema & client', 'Prisma repo implementations', 'Zod validation schemas', 'Depends on Core only']} />
-            <TechCard icon="🌐" title="API (api/)" items={['11 Vercel serverless functions', 'Zod → Use Case → Response', 'No Express, no routing lib', '10s timeout, stateless']} />
+            <TechCard icon="🌐" title="API (api/)" items={['15 Vercel serverless functions', 'Zod → Use Case → Response', 'No Express, no routing lib', '10s timeout, stateless']} />
             <TechCard icon="🖥️" title="Web App (apps/web)" items={['React 19 + Vite SPA', 'Hash routing (no react-router)', 'visionOS glass design system', '5 views + 2 modals']} />
           </TwoCol>
         </Section>

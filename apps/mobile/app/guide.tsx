@@ -28,17 +28,24 @@ const SECTIONS: Array<{ title: string; items: FaqItem[] }> = [
   {
     title: 'Submission Statuses',
     items: [
-      { q: 'What does "Pending" mean?', a: 'Your submission has been received and is waiting for the director to review it. No action needed on your end.' },
+      { q: 'What does "Pending" mean?', a: 'Your submission has been received and is waiting for the director to review it. While pending, you can re-submit a new video if needed.' },
       { q: 'What does "Shortlisted" mean?', a: 'Great news! The director liked your submission and has shortlisted you. This typically means you\'ll be called for the next round (e.g. an in-person callback).' },
       { q: 'What does "Reviewed" mean?', a: 'The director has watched your submission. This is a neutral status — they\'ve seen it but haven\'t made a final decision yet.' },
       { q: 'What does "Rejected" mean?', a: 'Unfortunately the director has decided not to move forward with your submission for this role. Don\'t be discouraged — keep trying for other castings! Any feedback from the director will be shown on your submission detail screen.' },
     ],
   },
   {
-    title: 'Feedback',
+    title: 'Feedback & Comments',
     items: [
       { q: 'How do I see director feedback?', a: 'Open the casting detail screen. If the director has left feedback, it will appear in the "Feedback" section under "Your Submission".' },
-      { q: 'Can I reply to feedback?', a: 'Not yet. A future update will add the ability to reply to director feedback and have a conversation thread.' },
+      { q: 'What are comments?', a: 'The director and their team can leave internal comments on your submission. These appear in the "Comments" section below your submission details, showing the author name and date.' },
+    ],
+  },
+  {
+    title: 'Attachments',
+    items: [
+      { q: 'What are attachments?', a: 'Directors can upload scripts, contracts, and reference materials to a casting round. These files appear in the "Attachments" section on the casting detail screen.' },
+      { q: 'How do I view an attachment?', a: 'Tap the "Open" button next to any attachment. PDFs and images will open in your browser. You can download or view the file from there.' },
     ],
   },
   {

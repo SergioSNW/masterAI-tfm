@@ -28,3 +28,13 @@ export { ManualUploadUseCase } from './submissions/ManualUploadUseCase'
 export type { ManualUploadDTO } from './submissions/ManualUploadUseCase'
 export { ReviewSubmissionUseCase } from './submissions/ReviewSubmissionUseCase'
 export type { ReviewSubmissionDTO } from './submissions/ReviewSubmissionUseCase'
+
+export { CreateCommentUseCase } from './comments/CreateCommentUseCase'
+export type { CreateCommentDTO } from './comments/CreateCommentUseCase'
+export { ListCommentsUseCase } from './comments/ListCommentsUseCase'
+export type { ListCommentsDTO } from './comments/ListCommentsUseCase'
+
+export { AddAttachmentUseCase } from './attachments/AddAttachmentUseCase'
+export type { AddAttachmentDTO } from './attachments/AddAttachmentUseCase'
+export { ListAttachmentsUseCase } from './attachments/ListAttachmentsUseCase'
+export type { ListAttachmentsDTO } from './attachments/ListAttachmentsUseCase'
