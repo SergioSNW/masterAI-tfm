@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useWindowDimensions, View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { router } from 'expo-router'
 import { colors, radii, spacing } from '../src/theme/colors'
 import { AvatarChip } from '../src/components/AvatarChip'
 import { CastingCard } from '../src/components/CastingCard'
@@ -90,7 +91,7 @@ export default function Dashboard() {
         {!loading && !error && castings.length > 0 && (
           <View style={styles.list}>
             {castings.map((casting, i) => (
-              <CastingCard key={casting.id} casting={casting} index={i} />
+              <CastingCard key={casting.id} casting={casting} index={i} onPress={() => router.push(`/casting/${casting.id}`)} />
             ))}
           </View>
         )}

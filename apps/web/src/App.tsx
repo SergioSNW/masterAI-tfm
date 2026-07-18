@@ -47,7 +47,18 @@ export default function App() {
           : <EmptyState />
       case 'round':
         return round
-          ? <RoundDetailView round={round} onBack={() => navigate(`casting/${round.castingId}`)} />
+          ? <RoundDetailView round={round} onBack={() => navigate(`casting/${round.castingId}`)} onReview={(subId, status, feedback) => {
+              setProjects(prev => prev.map(p => ({
+                ...p,
+                castings: p.castings.map(c => ({
+                  ...c,
+                  rounds: c.rounds.map(r => ({
+                    ...r,
+                    submissions: r.submissions.map(s => s.id === subId ? { ...s, status, feedback: feedback || s.feedback } : s),
+                  })),
+                })),
+              })))
+            }} />
           : <EmptyState />
       case 'actors':
         return <ActorsView />

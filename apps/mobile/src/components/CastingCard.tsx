@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions, StyleSheet } from 'react-native'
+import { View, Text, useWindowDimensions, StyleSheet, TouchableOpacity } from 'react-native'
 import { GlassCard } from './GlassCard'
 import { colors, radii, spacing } from '../theme/colors'
 import type { CastingDTO } from '../services/types'
@@ -21,13 +21,14 @@ function initials(text: string): string {
 interface Props {
   casting: CastingDTO
   index?: number
+  onPress?: () => void
 }
 
-export function CastingCard({ casting, index = 0 }: Props) {
+export function CastingCard({ casting, index = 0, onPress }: Props) {
   const { width } = useWindowDimensions()
   const narrow = width < 520
   const gradient = GRADIENTS[index % GRADIENTS.length]
-  return (
+  const inner = (
     <GlassCard padded={false}>
       <View style={[styles.hero, narrow && styles.heroNarrow, { backgroundColor: gradient[0] }]}>
         <Text style={[styles.heroText, narrow && styles.heroTextNarrow]}>
@@ -44,6 +45,11 @@ export function CastingCard({ casting, index = 0 }: Props) {
       </View>
     </GlassCard>
   )
+
+  if (onPress) {
+    return <TouchableOpacity onPress={onPress} activeOpacity={0.7}>{inner}</TouchableOpacity>
+  }
+  return inner
 }
 
 const styles = StyleSheet.create({

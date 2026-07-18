@@ -1,23 +1,39 @@
 import { useState } from 'react'
 import type { Round, Submission } from '../data/mock'
 import { UploadVideoModal } from '../components/UploadVideoModal'
+import { reviewSubmission } from '../services/submissionService'
 
 interface Props {
   round: Round
   onBack: () => void
+  onReview?: (submissionId: string, status: 'shortlisted' | 'reviewed' | 'rejected', feedback?: string) => void
 }
 
-export function RoundDetailView({ round, onBack }: Props) {
+export function RoundDetailView({ round, onBack, onReview }: Props) {
+  const [submissions, setSubmissions] = useState<Submission[]>(round.submissions)
   const [selected, setSelected] = useState<Submission | null>(null)
   const [feedback, setFeedback] = useState('')
   const [showUpload, setShowUpload] = useState(false)
 
+  async function handleReview(submissionId: string, status: 'shortlisted' | 'reviewed' | 'rejected') {
+    const sub = submissions.find(s => s.id === submissionId)
+    if (!sub) return
+
+    const updated: Submission = { ...sub, status, feedback: feedback || sub.feedback }
+    setSubmissions(prev => prev.map(s => s.id === submissionId ? updated : s))
+    setSelected(null)
+    setFeedback('')
+
+    reviewSubmission({ submissionId, status, feedback: feedback || undefined }).catch(() => {})
+    onReview?.(submissionId, status, feedback || undefined)
+  }
+
   const statusCounts = {
-    total: round.submissions.length,
-    pending: round.submissions.filter(s => s.status === 'pending').length,
-    shortlisted: round.submissions.filter(s => s.status === 'shortlisted').length,
-    reviewed: round.submissions.filter(s => s.status === 'reviewed').length,
-    rejected: round.submissions.filter(s => s.status === 'rejected').length,
+    total: submissions.length,
+    pending: submissions.filter(s => s.status === 'pending').length,
+    shortlisted: submissions.filter(s => s.status === 'shortlisted').length,
+    reviewed: submissions.filter(s => s.status === 'reviewed').length,
+    rejected: submissions.filter(s => s.status === 'rejected').length,
   }
 
   return (
@@ -57,7 +73,7 @@ export function RoundDetailView({ round, onBack }: Props) {
       <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Submissions</h2>
 
       <div className="submission-list">
-        {round.submissions.map((sub) => (
+        {submissions.map((sub) => (
           <div
             key={sub.id}
             className="submission-card glass glass-hover"
@@ -76,7 +92,7 @@ export function RoundDetailView({ round, onBack }: Props) {
           </div>
         ))}
 
-        {round.submissions.length === 0 && (
+        {submissions.length === 0 && (
           <div className="empty-state">
             <h3>No submissions yet</h3>
             <p>Upload a video to get started.</p>
@@ -121,9 +137,9 @@ export function RoundDetailView({ round, onBack }: Props) {
             </div>
 
             <div className="action-buttons">
-              <button className="btn btn-primary" onClick={() => setSelected(null)}>Shortlist</button>
-              <button className="btn btn-ghost" onClick={() => setSelected(null)}>Mark Reviewed</button>
-              <button className="btn btn-ghost" style={{ marginLeft: 'auto', color: 'var(--danger)' }} onClick={() => setSelected(null)}>Reject</button>
+              <button className="btn btn-primary" onClick={() => handleReview(selected.id, 'shortlisted')}>Shortlist</button>
+              <button className="btn btn-ghost" onClick={() => handleReview(selected.id, 'reviewed')}>Mark Reviewed</button>
+              <button className="btn btn-ghost" style={{ marginLeft: 'auto', color: 'var(--danger)' }} onClick={() => handleReview(selected.id, 'rejected')}>Reject</button>
             </div>
           </div>
         </div>

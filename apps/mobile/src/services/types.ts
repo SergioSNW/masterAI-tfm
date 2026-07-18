@@ -5,6 +5,11 @@ export interface CastingDTO {
   role: string
   deadline: string
   status: string
+  submission?: {
+    status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | null
+    feedback?: string
+    submittedAt?: string
+  }
 }
 
 export interface ActorDTO {

@@ -19,10 +19,20 @@ export interface UploadVideoInput {
   notes?: string
 }
 
+export interface ReviewInput {
+  submissionId: string
+  status: 'shortlisted' | 'reviewed' | 'rejected'
+  feedback?: string
+}
+
 export async function uploadVideo(input: UploadVideoInput): Promise<SubmissionDTO> {
   return post<SubmissionDTO>('/submissions/upload', input)
 }
 
 export async function fetchSubmissions(roundId: string): Promise<SubmissionDTO[]> {
   return get<SubmissionDTO[]>(`/submissions?roundId=${roundId}`)
+}
+
+export async function reviewSubmission(input: ReviewInput): Promise<void> {
+  await post('/submissions/review', input)
 }
