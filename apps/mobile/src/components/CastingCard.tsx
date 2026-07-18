@@ -28,31 +28,39 @@ export function CastingCard({ casting, index = 0, onPress }: Props) {
   const { width } = useWindowDimensions()
   const narrow = width < 520
   const gradient = GRADIENTS[index % GRADIENTS.length]
-  const inner = (
-    <GlassCard padded={false}>
-      <View style={[styles.hero, narrow && styles.heroNarrow, { backgroundColor: gradient[0] }]}>
-        <Text style={[styles.heroText, narrow && styles.heroTextNarrow]}>
-          {narrow ? initials(casting.title) : casting.title}
-        </Text>
-      </View>
-      <View style={styles.body}>
-        <Text style={styles.project}>{casting.projectName}</Text>
-        <View style={styles.meta}>
-          <Text style={styles.metaText}>{casting.role}</Text>
-          <Text style={styles.metaDot}>·</Text>
-          <Text style={styles.metaText}>Closes {casting.deadline}</Text>
+  const borderGrad = gradient[0] + '40'
+
+  const card = (
+    <View style={[styles.borderWrap, { backgroundColor: borderGrad }]}>
+      <GlassCard padded={false}>
+        <View style={[styles.hero, narrow && styles.heroNarrow, { backgroundColor: gradient[0] }]}>
+          <Text style={[styles.heroText, narrow && styles.heroTextNarrow]}>
+            {narrow ? initials(casting.title) : casting.title}
+          </Text>
         </View>
-      </View>
-    </GlassCard>
+        <View style={styles.body}>
+          <Text style={styles.project}>{casting.projectName}</Text>
+          <View style={styles.meta}>
+            <Text style={styles.metaText}>{casting.role}</Text>
+            <Text style={styles.metaDot}>·</Text>
+            <Text style={styles.metaText}>Closes {casting.deadline}</Text>
+          </View>
+        </View>
+      </GlassCard>
+    </View>
   )
 
   if (onPress) {
-    return <TouchableOpacity onPress={onPress} activeOpacity={0.7}>{inner}</TouchableOpacity>
+    return <TouchableOpacity onPress={onPress} activeOpacity={0.7}>{card}</TouchableOpacity>
   }
-  return inner
+  return card
 }
 
 const styles = StyleSheet.create({
+  borderWrap: {
+    borderRadius: radii.lg + 1,
+    padding: 1.5,
+  },
   hero: {
     height: 48,
     alignItems: 'center',

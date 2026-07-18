@@ -12,7 +12,7 @@ import { HelpView } from './views/HelpView'
 import { createProject } from './services/projectService'
 import { getProfile } from './services/profileService'
 import type { CreateProjectInput } from './services/projectService'
-import type { Project } from './data/mock'
+import type { Project, Casting, Round } from './data/mock'
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>(mockProjects)
@@ -41,11 +41,18 @@ export default function App() {
     switch (view) {
       case 'project':
         return project
-          ? <ProjectDetailView project={project} onBack={() => navigate('projects')} onCastingClick={(id) => navigate(`casting/${id}`)} />
+          ? <ProjectDetailView project={project} onBack={() => navigate('projects')} onCastingClick={(id) => navigate(`casting/${id}`)} onCastingCreate={(pid, c) => {
+              setProjects(prev => prev.map(p => p.id === pid ? { ...p, castings: [...p.castings, c] } : p))
+            }} />
           : <EmptyState />
       case 'casting':
         return casting
-          ? <CastingDetailView casting={casting} onBack={() => navigate(`project/${casting.projectId}`)} onRoundClick={(id) => navigate(`round/${id}`)} />
+          ? <CastingDetailView casting={casting} onBack={() => navigate(`project/${casting.projectId}`)} onRoundClick={(id) => navigate(`round/${id}`)} onRoundCreate={(cid, r) => {
+              setProjects(prev => prev.map(p => ({
+                ...p,
+                castings: p.castings.map(c => c.id === cid ? { ...c, rounds: [...c.rounds, r] } : c),
+              })))
+            }} />
           : <EmptyState />
       case 'round':
         return round
