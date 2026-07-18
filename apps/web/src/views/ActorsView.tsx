@@ -30,6 +30,7 @@ export function ActorsView() {
   }, [search, load])
 
   async function handleCreate(data: CreateActorInput) {
+    setError(null)
     try {
       await createActor(data)
       setShowCreate(false)

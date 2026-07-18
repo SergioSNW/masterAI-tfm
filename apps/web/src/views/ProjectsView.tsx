@@ -1,11 +1,17 @@
+import { useState } from 'react'
 import type { Project } from '../data/mock'
+import { CreateProjectModal } from '../components/CreateProjectModal'
+import type { CreateProjectInput } from '../services/projectService'
 
 interface Props {
   projects: Project[]
   onProjectClick: (id: string) => void
+  onProjectCreate: (data: CreateProjectInput) => Promise<void>
 }
 
-export function ProjectsView({ projects, onProjectClick }: Props) {
+export function ProjectsView({ projects, onProjectClick, onProjectCreate }: Props) {
+  const [showCreate, setShowCreate] = useState(false)
+
   return (
     <div>
       <div className="detail-header">
@@ -14,9 +20,19 @@ export function ProjectsView({ projects, onProjectClick }: Props) {
           <p>{projects.length} casting projects</p>
         </div>
         <div className="detail-header-right">
-          <button className="btn btn-primary">+ New Project</button>
+          <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ New Project</button>
         </div>
       </div>
+
+      {showCreate && (
+        <CreateProjectModal
+          onSubmit={async (data) => {
+            await onProjectCreate(data)
+            setShowCreate(false)
+          }}
+          onClose={() => setShowCreate(false)}
+        />
+      )}
 
       <div className="card-grid">
         {projects.map((project, i) => (

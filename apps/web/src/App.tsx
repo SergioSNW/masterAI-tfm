@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useHashRoute } from './hooks/useHashRoute'
 import { mockProjects } from './data/mock'
 import { ProjectsView } from './views/ProjectsView'
@@ -5,16 +6,34 @@ import { ProjectDetailView } from './views/ProjectDetailView'
 import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
 import { ActorsView } from './views/ActorsView'
+import { SettingsView } from './views/SettingsView'
+import { createProject } from './services/projectService'
+import { getProfile } from './services/profileService'
+import type { CreateProjectInput } from './services/projectService'
+import type { Project } from './data/mock'
 
 export default function App() {
+  const [projects, setProjects] = useState<Project[]>(mockProjects)
   const { route, navigate } = useHashRoute()
 
   const parts = route.split('/')
   const view = parts[0]
 
-  const project = view === 'project' ? mockProjects.find(p => p.id === parts[1]) : null
-  const casting = view === 'casting' ? mockProjects.flatMap(p => p.castings).find(c => c.id === parts[1]) : null
-  const round = view === 'round' ? mockProjects.flatMap(p => p.castings.flatMap(c => c.rounds)).find(r => r.id === parts[1]) : null
+  const project = view === 'project' ? projects.find(p => p.id === parts[1]) : null
+  const casting = view === 'casting' ? projects.flatMap(p => p.castings).find(c => c.id === parts[1]) : null
+  const round = view === 'round' ? projects.flatMap(p => p.castings.flatMap(c => c.rounds)).find(r => r.id === parts[1]) : null
+
+  async function handleProjectCreate(data: CreateProjectInput) {
+    const res = await createProject(data).catch(() => null)
+    const newProject: Project = {
+      id: res?.id ?? `p${Date.now()}`,
+      title: data.title,
+      description: data.description,
+      status: 'active',
+      castings: [],
+    }
+    setProjects(prev => [...prev, newProject])
+  }
 
   function renderView() {
     switch (view) {
@@ -32,8 +51,10 @@ export default function App() {
           : <EmptyState />
       case 'actors':
         return <ActorsView />
+      case 'settings':
+        return <SettingsView />
       default:
-        return <ProjectsView projects={mockProjects} onProjectClick={(id) => navigate(`project/${id}`)} />
+        return <ProjectsView projects={projects} onProjectClick={(id) => navigate(`project/${id}`)} onProjectCreate={handleProjectCreate} />
     }
   }
 
@@ -47,13 +68,13 @@ export default function App() {
 
       <aside className="sidebar glass">
         <div className="logo">MasterAI</div>
-        <button className={`nav-item ${view === 'projects' ? 'active' : ''}`} onClick={() => navigate('projects')}>
+        <button className={`nav-item ${view === 'projects' || view === '' || view === 'project' || view === 'casting' || view === 'round' ? 'active' : ''}`} onClick={() => navigate('projects')}>
           <span>🎬</span> Projects
         </button>
         <button className={`nav-item ${view === 'actors' ? 'active' : ''}`} onClick={() => navigate('actors')}>
           <span>👥</span> Actors
         </button>
-        <button className="nav-item">
+        <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => navigate('settings')}>
           <span>⚙️</span> Settings
         </button>
       </aside>
@@ -62,8 +83,8 @@ export default function App() {
         <header className="topbar glass">
           <h1 className="topbar-title">Director Dashboard</h1>
           <div className="topbar-right">
-            <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Sarah Connor</span>
-            <div className="avatar">SC</div>
+            <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{getProfile().name}</span>
+            <div className="avatar">{getProfile().name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
           </div>
         </header>
         <div className="content">

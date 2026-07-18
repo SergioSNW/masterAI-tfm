@@ -1,14 +1,7 @@
 import { View, Text, useWindowDimensions, StyleSheet } from 'react-native'
 import { GlassCard } from './GlassCard'
 import { colors, radii, spacing } from '../theme/colors'
-
-interface Casting {
-  id: string
-  title: string
-  projectName: string
-  role: string
-  deadline: string
-}
+import type { CastingDTO } from '../services/types'
 
 const GRADIENTS = [
   ['#6366f1', '#a855f7'],
@@ -26,7 +19,7 @@ function initials(text: string): string {
 }
 
 interface Props {
-  casting: Casting
+  casting: CastingDTO
   index?: number
 }
 
