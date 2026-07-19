@@ -10,8 +10,9 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'npm run dev -w apps/web',
+    command: 'npx vite --port 3001 --host 0.0.0.0',
     port: 3001,
+    cwd: 'apps/web',
     reuseExistingServer: true,
   },
 })
