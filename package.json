@@ -18,7 +18,9 @@
     "test": "npm run test -w packages/core && npm run test -w packages/infrastructure && npm run test -w apps/web",
     "test:core": "npm run test -w packages/core",
     "test:infra": "npm run test -w packages/infrastructure",
-    "test:web": "npm run test -w apps/web"
+    "test:web": "npm run test -w apps/web",
+    "test:e2e": "npx playwright test --config e2e/playwright.config.ts",
+    "test:all": "npm test && npm run test:e2e"
   },
   "devDependencies": {
     "expo-router": "~4.0.0",

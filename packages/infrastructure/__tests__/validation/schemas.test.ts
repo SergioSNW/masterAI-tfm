@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { CreateActorSchema } from '../../validation/actors'
-import { CreateProjectSchema } from '../../validation/projects'
-import { CreateCastingSchema } from '../../validation/castings'
-import { CreateRoundSchema } from '../../validation/rounds'
-import { SubmitVideoSchema, ReviewSubmissionSchema } from '../../validation/submissions'
+import { CreateProjectSchema, CloseProjectSchema } from '../../validation/projects'
+import { CreateCastingSchema, CloseCastingSchema } from '../../validation/castings'
+import { CreateRoundSchema, OpenRoundSchema, CloseRoundSchema } from '../../validation/rounds'
+import { SubmitVideoSchema, ReviewSubmissionSchema, ManualUploadSchema } from '../../validation/submissions'
+import { CreateCommentSchema, ListCommentsSchema } from '../../validation/comments'
+import { AddAttachmentSchema, ListAttachmentsSchema } from '../../validation/attachments'
 
 describe('CreateActorSchema', () => {
   it('accepts valid input', () => {
@@ -86,6 +88,134 @@ describe('ReviewSubmissionSchema', () => {
 
   it('rejects invalid status', () => {
     const result = ReviewSubmissionSchema.safeParse({ submissionId: crypto.randomUUID(), status: 'unknown' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('ManualUploadSchema', () => {
+  it('accepts valid input', () => {
+    const result = ManualUploadSchema.safeParse({ roundId: crypto.randomUUID(), actorId: crypto.randomUUID(), videoData: 'base64string', fileName: 'video.mp4' })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects empty videoData', () => {
+    const result = ManualUploadSchema.safeParse({ roundId: crypto.randomUUID(), actorId: crypto.randomUUID(), videoData: '', fileName: 'video.mp4' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects empty fileName', () => {
+    const result = ManualUploadSchema.safeParse({ roundId: crypto.randomUUID(), actorId: crypto.randomUUID(), videoData: 'data', fileName: '' })
+    expect(result.success).toBe(false)
+  })
+
+  it('accepts optional notes', () => {
+    const result = ManualUploadSchema.safeParse({ roundId: crypto.randomUUID(), actorId: crypto.randomUUID(), videoData: 'data', fileName: 'video.mp4', notes: 'Good take' })
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('CloseProjectSchema', () => {
+  it('accepts valid input', () => {
+    const result = CloseProjectSchema.safeParse({ projectId: crypto.randomUUID(), directorId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid projectId', () => {
+    const result = CloseProjectSchema.safeParse({ projectId: 'bad', directorId: crypto.randomUUID() })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('CloseCastingSchema', () => {
+  it('accepts valid input', () => {
+    const result = CloseCastingSchema.safeParse({ castingId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid uuid', () => {
+    const result = CloseCastingSchema.safeParse({ castingId: 'bad' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('OpenRoundSchema', () => {
+  it('accepts valid input', () => {
+    const result = OpenRoundSchema.safeParse({ roundId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid uuid', () => {
+    const result = OpenRoundSchema.safeParse({ roundId: 'bad' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('CloseRoundSchema', () => {
+  it('accepts valid input', () => {
+    const result = CloseRoundSchema.safeParse({ roundId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid uuid', () => {
+    const result = CloseRoundSchema.safeParse({ roundId: 'bad' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('CreateCommentSchema', () => {
+  it('accepts valid input', () => {
+    const result = CreateCommentSchema.safeParse({ submissionId: crypto.randomUUID(), authorName: 'Director', content: 'Great take' })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects empty authorName', () => {
+    const result = CreateCommentSchema.safeParse({ submissionId: crypto.randomUUID(), authorName: '', content: 'Nice' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects empty content', () => {
+    const result = CreateCommentSchema.safeParse({ submissionId: crypto.randomUUID(), authorName: 'Director', content: '' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('ListCommentsSchema', () => {
+  it('accepts valid input', () => {
+    const result = ListCommentsSchema.safeParse({ submissionId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid uuid', () => {
+    const result = ListCommentsSchema.safeParse({ submissionId: 'bad' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('AddAttachmentSchema', () => {
+  it('accepts valid input', () => {
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'script.pdf', fileType: 'application/pdf', fileData: 'base64', fileSize: 50000 })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects empty fileName', () => {
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: '', fileType: 'application/pdf', fileData: 'data', fileSize: 1000 })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects non-positive fileSize', () => {
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'f.pdf', fileType: 'application/pdf', fileData: 'data', fileSize: 0 })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('ListAttachmentsSchema', () => {
+  it('accepts valid input', () => {
+    const result = ListAttachmentsSchema.safeParse({ roundId: crypto.randomUUID() })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid uuid', () => {
+    const result = ListAttachmentsSchema.safeParse({ roundId: 'bad' })
     expect(result.success).toBe(false)
   })
 })
