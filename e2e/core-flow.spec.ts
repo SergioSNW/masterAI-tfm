@@ -18,7 +18,7 @@ test.describe('Core flow — Director Dashboard', () => {
     await page.getByText('Help').click()
     await expect(page.getByRole('heading', { name: /director guide/i })).toBeVisible()
 
-    await page.getByText('Settings').click()
+    await page.getByText('Settings').first().click()
     await expect(page.getByRole('heading', { name: /settings/i })).toBeVisible()
 
     await page.getByText('Projects').click()
@@ -60,7 +60,7 @@ test.describe('Core flow — Director Dashboard', () => {
     await page.getByText('Self-Tape Submission').click()
 
     await page.getByText('Emma Richardson').click()
-    await expect(page.getByText('emma.r@example.com')).toBeVisible()
+    await expect(page.getByText('emma.r@example.com').first()).toBeVisible()
     await expect(page.getByRole('button', { name: /shortlist/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /mark reviewed/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /reject/i })).toBeVisible()
@@ -72,7 +72,7 @@ test.describe('Core flow — Director Dashboard', () => {
     await page.getByText('Self-Tape Submission').click()
 
     await expect(page.getByText('Total').locator('..').getByText('4')).toBeVisible()
-    await expect(page.getByText('Pending').locator('..').getByText('2')).toBeVisible()
+    await expect(page.getByText('Pending').locator('..').getByText('2').first()).toBeVisible()
     await expect(page.getByText('Shortlisted').locator('..').getByText('1')).toBeVisible()
   })
 })
@@ -86,8 +86,8 @@ test.describe('Actors view', () => {
     await page.getByRole('button', { name: /new actor/i }).click()
     await expect(page.getByRole('heading', { name: /new actor/i })).toBeVisible()
 
-    await page.getByPlaceholder(/name/i).fill('Test Actor')
-    await page.getByPlaceholder(/email/i).fill('test@playwright.com')
+    await page.locator('input[name="name"]').fill('Test Actor')
+    await page.locator('input[name="email"]').fill('test@playwright.com')
     await page.getByRole('button', { name: /create actor/i }).click()
 
     await expect(page.getByText('Test Actor')).toBeVisible()

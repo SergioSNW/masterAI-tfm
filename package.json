@@ -24,7 +24,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "expo-router": "~4.0.0",
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "react-native-worklets": "^0.5.1"
   }
 }
