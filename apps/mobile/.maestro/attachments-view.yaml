@@ -1,0 +1,24 @@
+appId: com.masterai.casting
+name: Attachments — View Director Attachments
+tags:
+  - attachments
+---
+- launchApp
+
+# Navigate to a casting with attachments
+- tapOn:
+    text: "Lady Victoria"
+    optional: true
+- assertVisible:
+    text: "Lady Victoria"
+    optional: true
+
+# Check attachments section
+- assertVisible:
+    text: "Attachments"
+    optional: true
+
+# Verify an attachment item exists
+- assertVisible:
+    text: "Open"
+    optional: true

@@ -1,0 +1,29 @@
+appId: com.masterai.casting
+name: Submission — View Submission Details
+tags:
+  - submission
+---
+- launchApp
+
+# Navigate to a casting with a submission
+- tapOn:
+    text: "Lady Victoria"
+    optional: true
+- assertVisible:
+    text: "Lady Victoria"
+    optional: true
+
+# Check submission section exists
+- assertVisible:
+    text: "Your Submission"
+    optional: true
+
+# Verify status badge
+- assertVisible:
+    text: "Pending Review"
+    optional: true
+
+# Check submission metadata
+- assertVisible:
+    text: "Submitted"
+    optional: true

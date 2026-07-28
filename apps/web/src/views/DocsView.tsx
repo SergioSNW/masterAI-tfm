@@ -40,7 +40,7 @@ export function DocsView() {
             <ERDArrow />
             <ERDTable name="Round" fields={['id (UUID, PK)', 'castingId (FK → Casting)', 'name', 'description?', 'deadline?', 'order (int)', 'status (pending|open|closed)', 'timestamps']} color="#22c55e" />
             <ERDArrow />
-            <ERDTable name="Attachment" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'fileName', 'fileType', 'fileData (Base64)', 'fileSize (int)', 'timestamps']} color="#eab308" />
+            <ERDTable name="Attachment" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'url (Vercel Blob)', 'fileName', 'fileType', 'fileSize (int)', 'createdAt']} color="#eab308" />
             <ERDArrow style={{ opacity: 0.3 }} />
             <ERDTable name="Submission" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'actorId (FK → Actor)', 'videoUrl (bytea as Base64)', 'thumbnailUrl?', 'notes?', 'status (pending|reviewed|shortlisted|rejected)', 'feedback?', 'timestamps']} color="#eab308" />
             <ERDArrow style={{ opacity: 0.3 }} />

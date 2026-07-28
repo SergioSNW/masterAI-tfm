@@ -25,3 +25,7 @@ export function get<T>(url: string): Promise<T> {
 export function post<T>(url: string, body: unknown): Promise<T> {
   return request<T>(url, { method: 'POST', body: JSON.stringify(body) })
 }
+
+export function del<T = void>(url: string): Promise<T> {
+  return request<T>(url, { method: 'DELETE' })
+}

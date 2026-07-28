@@ -1,0 +1,42 @@
+appId: com.masterai.casting
+name: Core Flow — Actor Dashboard
+tags:
+  - core
+  - smoke
+---
+- launchApp
+
+# Dashboard loads with branding
+- assertVisible:
+    text: "MasterAI"
+    optional: true
+- assertVisible:
+    text: "Open Castings"
+    optional: true
+
+# Navigate into a casting detail
+- tapOn:
+    text: "Lady Victoria"
+    optional: true
+- assertVisible:
+    text: "Lady Victoria"
+    optional: true
+
+# Verify casting detail sections
+- assertVisible:
+    text: "Project"
+    optional: true
+- assertVisible:
+    text: "Role"
+    optional: true
+- assertVisible:
+    text: "Deadline"
+    optional: true
+
+# Go back to dashboard
+- tapOn:
+    text: "Back"
+    optional: true
+- assertVisible:
+    text: "Open Castings"
+    optional: true

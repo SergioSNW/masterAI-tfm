@@ -4,7 +4,7 @@ export interface Submission {
   id: string
   roundId: string
   actorId: string
-  videoUrl: string
+  videoUrl?: string
   thumbnailUrl?: string
   notes?: string
   status: SubmissionStatus

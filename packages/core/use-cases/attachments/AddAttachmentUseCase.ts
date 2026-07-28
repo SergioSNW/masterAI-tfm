@@ -2,14 +2,13 @@ import type { Attachment } from '../../entities'
 import type { IAttachmentRepository, IRoundRepository } from '../../repositories'
 import type { Result } from '../types'
 
-const ALLOWED_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'text/plain']
-const MAX_SIZE_BYTES = 10 * 1024 * 1024
+const MAX_SIZE_BYTES = 50 * 1024 * 1024
 
 export interface AddAttachmentDTO {
   roundId: string
   fileName: string
   fileType: string
-  fileData: string
+  url: string
   fileSize: number
 }
 
@@ -30,7 +29,7 @@ export class AddAttachmentUseCase {
     }
 
     if (dto.fileSize > MAX_SIZE_BYTES) {
-      return { ok: false, error: new Error(`File exceeds 10MB limit (${(dto.fileSize / 1024 / 1024).toFixed(1)}MB)`) }
+      return { ok: false, error: new Error(`File exceeds 50MB limit (${(dto.fileSize / 1024 / 1024).toFixed(1)}MB)`) }
     }
 
     const attachment: Attachment = {
@@ -38,10 +37,9 @@ export class AddAttachmentUseCase {
       roundId: dto.roundId,
       fileName: dto.fileName,
       fileType: dto.fileType,
-      fileData: dto.fileData,
+      url: dto.url,
       fileSize: dto.fileSize,
       createdAt: new Date(),
-      updatedAt: new Date(),
     }
 
     const created = await this.attachmentRepo.create(attachment)

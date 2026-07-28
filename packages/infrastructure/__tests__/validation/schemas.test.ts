@@ -193,17 +193,17 @@ describe('ListCommentsSchema', () => {
 
 describe('AddAttachmentSchema', () => {
   it('accepts valid input', () => {
-    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'script.pdf', fileType: 'application/pdf', fileData: 'base64', fileSize: 50000 })
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'script.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/file.pdf', fileSize: 50000 })
     expect(result.success).toBe(true)
   })
 
   it('rejects empty fileName', () => {
-    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: '', fileType: 'application/pdf', fileData: 'data', fileSize: 1000 })
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: '', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/file.pdf', fileSize: 1000 })
     expect(result.success).toBe(false)
   })
 
   it('rejects non-positive fileSize', () => {
-    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'f.pdf', fileType: 'application/pdf', fileData: 'data', fileSize: 0 })
+    const result = AddAttachmentSchema.safeParse({ roundId: crypto.randomUUID(), fileName: 'f.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/file.pdf', fileSize: 0 })
     expect(result.success).toBe(false)
   })
 })

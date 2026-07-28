@@ -49,7 +49,7 @@ describe('RoundDetailView', () => {
     render(<RoundDetailView round={mockRound} onBack={vi.fn()} />)
     expect(screen.getByText('Total')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('1')).toBeInTheDocument() // Pending count
+    expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(2)
   })
 
   it('renders all submissions in the list', () => {
@@ -86,7 +86,7 @@ describe('RoundDetailView', () => {
 
   it('loads and displays attachments section', async () => {
     vi.mocked(attachmentService.fetchAttachments).mockResolvedValue([
-      { id: 'a1', roundId: 'r1', fileName: 'script.pdf', fileType: 'application/pdf', fileData: '#', fileSize: 50000, createdAt: '2026-07-01' },
+      { id: 'a1', roundId: 'r1', fileName: 'script.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/file.pdf', fileSize: 50000, createdAt: '2026-07-01' },
     ])
 
     render(<RoundDetailView round={mockRound} onBack={vi.fn()} />)
@@ -94,9 +94,22 @@ describe('RoundDetailView', () => {
     expect(screen.getByText(/48\.8 KB/)).toBeInTheDocument()
   })
 
-  it('shows empty state when no attachments', async () => {
+  it('shows upload prompt when no attachments', async () => {
     render(<RoundDetailView round={mockRound} onBack={vi.fn()} />)
-    expect(await screen.findByText(/No attachments yet/)).toBeInTheDocument()
+    expect(await screen.findByText(/Drag.*drop/)).toBeInTheDocument()
+    expect(screen.getByText(/Max 50 MB/)).toBeInTheDocument()
+  })
+
+  it('renders the drop zone on open rounds', async () => {
+    render(<RoundDetailView round={mockRound} onBack={vi.fn()} />)
+    expect(await screen.findByText(/Drag.*drop/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /upload file/i })).toBeInTheDocument()
+  })
+
+  it('hides the drop zone on closed rounds', async () => {
+    const closedRound = { ...mockRound, status: 'closed' as const }
+    render(<RoundDetailView round={closedRound} onBack={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: /upload file/i })).not.toBeInTheDocument()
   })
 
   it('calls onBack when back button is clicked', async () => {

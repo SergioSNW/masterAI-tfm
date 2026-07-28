@@ -8,7 +8,7 @@ describe('ListAttachmentsUseCase', () => {
     const attachmentRepo: IAttachmentRepository = {
       findById: vi.fn(),
       findByRoundId: vi.fn().mockResolvedValue([
-        { id: 'a1', roundId: 'r1', fileName: 'script.pdf', fileType: 'application/pdf', fileData: '#', fileSize: 50000, createdAt: new Date(), updatedAt: new Date() },
+        { id: 'a1', roundId: 'r1', fileName: 'script.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/file.pdf', fileSize: 50000, createdAt: new Date() },
       ] as Attachment[]),
       create: vi.fn(),
       delete: vi.fn(),

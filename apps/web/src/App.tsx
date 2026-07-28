@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Toaster } from 'sonner'
 import { useHashRoute } from './hooks/useHashRoute'
 import { mockProjects } from './data/mock'
 import { ProjectsView } from './views/ProjectsView'
@@ -9,6 +10,7 @@ import { ActorsView } from './views/ActorsView'
 import { SettingsView } from './views/SettingsView'
 import { DocsView } from './views/DocsView'
 import { HelpView } from './views/HelpView'
+import { EmptyState } from './components/EmptyState'
 import { createProject } from './services/projectService'
 import { getProfile } from './services/profileService'
 import type { CreateProjectInput } from './services/projectService'
@@ -44,7 +46,7 @@ export default function App() {
           ? <ProjectDetailView project={project} onBack={() => navigate('projects')} onCastingClick={(id) => navigate(`casting/${id}`)} onCastingCreate={(pid, c) => {
               setProjects(prev => prev.map(p => p.id === pid ? { ...p, castings: [...p.castings, c] } : p))
             }} />
-          : <EmptyState />
+          : <EmptyState icon="🔍" title="Not Found" description="The requested project could not be found." />
       case 'casting':
         return casting
           ? <CastingDetailView casting={casting} onBack={() => navigate(`project/${casting.projectId}`)} onRoundClick={(id) => navigate(`round/${id}`)} onRoundCreate={(cid, r) => {
@@ -53,7 +55,7 @@ export default function App() {
                 castings: p.castings.map(c => c.id === cid ? { ...c, rounds: [...c.rounds, r] } : c),
               })))
             }} />
-          : <EmptyState />
+          : <EmptyState icon="🔍" title="Not Found" description="The requested casting could not be found." />
       case 'round':
         return round
           ? <RoundDetailView round={round} onBack={() => navigate(`casting/${round.castingId}`)} onReview={(subId, status, feedback) => {
@@ -68,7 +70,7 @@ export default function App() {
                 })),
               })))
             }} />
-          : <EmptyState />
+          : <EmptyState icon="🔍" title="Not Found" description="The requested round could not be found." />
       case 'actors':
         return <ActorsView />
       case 'settings':
@@ -84,6 +86,19 @@ export default function App() {
 
   return (
     <div className="app-layout">
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'rgba(20,20,30,0.95)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid var(--glass-border)',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font)',
+            fontSize: 14,
+          },
+        }}
+      />
       <div className="bg-orbs">
         <div className="orb orb-1" />
         <div className="orb orb-2" />
@@ -121,15 +136,6 @@ export default function App() {
           {renderView()}
         </div>
       </main>
-    </div>
-  )
-}
-
-function EmptyState() {
-  return (
-    <div className="empty-state">
-      <h3>Not Found</h3>
-      <p>The requested page could not be found.</p>
     </div>
   )
 }

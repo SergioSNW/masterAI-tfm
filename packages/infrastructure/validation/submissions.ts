@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const SubmitVideoSchema = z.object({
   roundId: z.string().uuid(),
   actorId: z.string().uuid(),
-  videoUrl: z.string().url(),
+  videoUrl: z.string().url().optional(),
   thumbnailUrl: z.string().url().optional(),
   notes: z.string().max(2000).optional(),
 })

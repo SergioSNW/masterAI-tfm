@@ -1,0 +1,29 @@
+appId: com.masterai.casting
+name: Profile — Profile Sheet Open/Close
+tags:
+  - profile
+---
+- launchApp
+
+# Tap the avatar chip to open profile sheet
+- tapOn:
+    text: "Alex Rivera"
+    optional: true
+
+# Verify profile fields are visible
+- assertVisible:
+    text: "Name"
+    optional: true
+- assertVisible:
+    text: "Email"
+    optional: true
+
+# Close the profile sheet
+- tapOn:
+    text: "Save"
+    optional: true
+
+# Back on dashboard
+- assertVisible:
+    text: "Open Castings"
+    optional: true

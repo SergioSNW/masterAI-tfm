@@ -1,11 +1,11 @@
-import { post, get } from './api'
+import { post, get, del } from './api'
 
 export interface AttachmentDTO {
   id: string
   roundId: string
   fileName: string
   fileType: string
-  fileData: string
+  url: string
   fileSize: number
   createdAt: string
 }
@@ -14,7 +14,7 @@ export interface AddAttachmentInput {
   roundId: string
   fileName: string
   fileType: string
-  fileData: string
+  url: string
   fileSize: number
 }
 
@@ -44,9 +44,14 @@ export async function addAttachment(input: AddAttachmentInput): Promise<Attachme
   return newAttachment
 }
 
+export async function removeAttachment(id: string): Promise<void> {
+  await del(`/rounds/attachment/${id}`).catch(() => {})
+  localAttachments = localAttachments.filter(a => a.id !== id)
+}
+
 export function downloadAttachment(attachment: AttachmentDTO) {
   const link = document.createElement('a')
-  link.href = attachment.fileData.startsWith('data:') ? attachment.fileData : `data:${attachment.fileType};base64,${attachment.fileData}`
+  link.href = attachment.url
   link.download = attachment.fileName
   document.body.appendChild(link)
   link.click()

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import path from 'path'
 
 test.describe('Core flow — Director Dashboard', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,7 +11,7 @@ test.describe('Core flow — Director Dashboard', () => {
     await expect(page.getByText('Director Dashboard')).toBeVisible()
 
     await page.getByText('Actors').click()
-    await expect(page.getByRole('heading', { name: /actors/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Actors', exact: true })).toBeVisible()
 
     await page.getByText('Docs').click()
     await expect(page.getByRole('heading', { name: /documentation/i })).toBeVisible()
@@ -73,7 +74,47 @@ test.describe('Core flow — Director Dashboard', () => {
 
     await expect(page.getByText('Total').locator('..').getByText('4')).toBeVisible()
     await expect(page.getByText('Pending').locator('..').getByText('2').first()).toBeVisible()
-    await expect(page.getByText('Shortlisted').locator('..').getByText('1')).toBeVisible()
+    await expect(page.getByText('Shortlisted').locator('..').getByText('1').first()).toBeVisible()
+  })
+})
+
+test.describe('Attachments — Director uploads documents', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.getByText('The Crown — Season 3').click()
+    await page.getByText('Lady Victoria').click()
+    await page.getByText('Self-Tape Submission').click()
+  })
+
+  test('shows attachments section with drop zone on open round', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: /attachments/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /upload file/i })).toBeVisible()
+    await expect(page.getByText(/drag.*drop/i)).toBeVisible()
+    await expect(page.getByText(/no attachments yet/i)).toBeVisible()
+  })
+
+  test('uploading a file via file picker adds it to the attachment list', async ({ page }) => {
+    const fileChooserPromise = page.waitForEvent('filechooser')
+    await page.getByRole('button', { name: /upload file/i }).click()
+    const fileChooser = await fileChooserPromise
+    await fileChooser.setFiles({
+      name: 'casting-sides.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('fake-pdf-content'),
+    })
+
+    await expect(page.getByText('casting-sides.pdf')).toBeVisible()
+    await expect(page.getByText(/KB/)).toBeVisible()
+  })
+
+  test('hides drop zone on closed round', async ({ page }) => {
+    await page.goto('/')
+    await page.getByText('The Crown — Season 3').click()
+    await page.getByText('Lady Victoria').click()
+    await page.getByText('Callback — In-Person').click()
+
+    await expect(page.getByRole('heading', { name: /attachments/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /upload file/i })).not.toBeVisible()
   })
 })
 

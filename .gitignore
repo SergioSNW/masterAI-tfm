@@ -4,3 +4,6 @@ dist/
 *.log
 test-results/
 playwright-report/
+ARCHITECTURE_TEXTBOOK.md
+.vercel
+.env*

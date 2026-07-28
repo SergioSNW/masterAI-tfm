@@ -8,6 +8,7 @@ import { CastingCard } from '../src/components/CastingCard'
 import { ProfileSheet } from '../src/components/ProfileSheet'
 import { GlassButton } from '../src/components/GlassButton'
 import { fetchOpenCastings } from '../src/services/castingService'
+import { loadProfile } from '../src/services/profileService'
 import type { CastingDTO } from '../src/services/types'
 
 function SkeletonCard() {
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [castings, setCastings] = useState<CastingDTO[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [profileName, setProfileName] = useState('Alex Rivera')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -46,6 +48,10 @@ export default function Dashboard() {
 
   useEffect(() => { load() }, [load])
 
+  useEffect(() => {
+    loadProfile().then(p => setProfileName(p.name))
+  }, [])
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -58,7 +64,7 @@ export default function Dashboard() {
               </TouchableOpacity>
             </View>
             <Text style={styles.welcome}>Welcome to your actor dashboard</Text>
-            <AvatarChip name="Alex Rivera" onPress={() => setProfileVisible(true)} />
+            <AvatarChip name={profileName} onPress={() => setProfileVisible(true)} />
           </View>
         ) : (
           <View style={styles.headerRow}>
@@ -68,7 +74,7 @@ export default function Dashboard() {
                 <Text style={styles.helpBtnText}>❓</Text>
               </TouchableOpacity>
             </View>
-            <AvatarChip name="Alex Rivera" onPress={() => setProfileVisible(true)} />
+            <AvatarChip name={profileName} onPress={() => setProfileVisible(true)} />
           </View>
         )}
 
@@ -104,7 +110,10 @@ export default function Dashboard() {
         )}
       </ScrollView>
 
-      <ProfileSheet visible={profileVisible} onClose={() => setProfileVisible(false)} />
+      <ProfileSheet visible={profileVisible} onClose={() => {
+        setProfileVisible(false)
+        loadProfile().then(p => setProfileName(p.name))
+      }} />
     </SafeAreaView>
   )
 }

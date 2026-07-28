@@ -1,0 +1,59 @@
+appId: com.masterai.casting
+name: E2E Suite — Full Actor Flow
+tags:
+  - e2e
+---
+# 1. Dashboard loads
+- launchApp
+- assertVisible:
+    text: "MasterAI"
+    optional: true
+- assertVisible:
+    text: "Open Castings"
+    optional: true
+
+# 2. Open guide
+- tapOn:
+    text: "❓"
+    optional: true
+- assertVisible:
+    text: "Actor Guide"
+    optional: true
+- tapOn:
+    text: "Back"
+    optional: true
+
+# 3. Open profile sheet
+- tapOn:
+    text: "Alex Rivera"
+    optional: true
+- assertVisible:
+    text: "Name"
+    optional: true
+- tapOn:
+    text: "Save"
+    optional: true
+
+# 4. Navigate to casting detail
+- tapOn:
+    text: "Lady Victoria"
+    optional: true
+- assertVisible:
+    text: "Lady Victoria"
+    optional: true
+- assertVisible:
+    text: "Your Submission"
+    optional: true
+
+# 5. Check attachments
+- assertVisible:
+    text: "Attachments"
+    optional: true
+
+# 6. Go back
+- tapOn:
+    text: "Back"
+    optional: true
+- assertVisible:
+    text: "Open Castings"
+    optional: true

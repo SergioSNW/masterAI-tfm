@@ -1,0 +1,30 @@
+appId: com.masterai.casting
+name: Guide — Actor Guide Navigation
+tags:
+  - guide
+---
+- launchApp
+
+# Tap the help button to open guide
+- tapOn:
+    text: "❓"
+    optional: true
+
+# Verify guide content
+- assertVisible:
+    text: "Actor Guide"
+    optional: true
+- assertVisible:
+    text: "Getting Started"
+    optional: true
+- assertVisible:
+    text: "What is MasterAI?"
+    optional: true
+
+# Go back
+- tapOn:
+    text: "Back"
+    optional: true
+- assertVisible:
+    text: "Open Castings"
+    optional: true

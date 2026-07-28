@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View, Text, TextInput, StyleSheet,
-  TouchableOpacity, Modal, ScrollView,
+  TouchableOpacity, Modal, ScrollView, ActivityIndicator,
 } from 'react-native'
 import { colors, radii, spacing } from '../theme/colors'
 import { GlassButton } from './GlassButton'
+import { loadProfile, saveProfile } from '../services/profileService'
+import type { ActorDTO } from '../services/types'
 
 interface Props {
   visible: boolean
@@ -30,41 +32,52 @@ const FIELDS: Field[] = [
   { key: 'name', label: 'Name' },
   { key: 'email', label: 'Email' },
   { key: 'phone', label: 'Phone', placeholder: '+1 555 123 456' },
-  { key: 'location', label: 'Location', placeholder: 'Los Angeles, CA' },
-  { key: 'agent', label: 'Agent', placeholder: 'Not represented' },
 ]
 
 export function ProfileSheet({ visible, onClose }: Props) {
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState<Record<string, string>>({
-    name: 'Alex Rivera',
-    email: 'alex@example.com',
-    phone: '+1 555 123 456',
-    location: 'Los Angeles, CA',
-    agent: '',
-  })
+  const [draft, setDraft] = useState<ActorDTO | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (visible) {
+      loadProfile().then(p => setDraft(p))
+      setEditing(false)
+    }
+  }, [visible])
 
   function startEditing() {
     setEditing(true)
   }
 
-  function save() {
-    setEditing(false)
+  async function save() {
+    if (!draft) return
+    setSaving(true)
+    try {
+      await saveProfile(draft)
+      setEditing(false)
+    } finally {
+      setSaving(false)
+    }
   }
 
   function cancel() {
-    setDraft({
-      name: 'Alex Rivera',
-      email: 'alex@example.com',
-      phone: '+1 555 123 456',
-      location: 'Los Angeles, CA',
-      agent: draft.agent,
-    })
+    loadProfile().then(p => setDraft(p))
     setEditing(false)
   }
 
   function setValue(key: string, value: string) {
-    setDraft(prev => ({ ...prev, [key]: value }))
+    setDraft(prev => prev ? { ...prev, [key]: value } : prev)
+  }
+
+  if (!draft) {
+    return (
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color={colors.accent['1']} />
+        </View>
+      </Modal>
+    )
   }
 
   return (
@@ -80,7 +93,7 @@ export function ProfileSheet({ visible, onClose }: Props) {
 
           <View style={styles.avatarSection}>
             <View style={styles.avatarLarge}>
-              <Text style={styles.avatarInitials}>{initials(draft.name || 'Alex Rivera')}</Text>
+              <Text style={styles.avatarInitials}>{initials(draft.name || 'AR')}</Text>
             </View>
           </View>
 
@@ -91,15 +104,15 @@ export function ProfileSheet({ visible, onClose }: Props) {
                 {editing ? (
                   <TextInput
                     style={styles.fieldInput}
-                    value={draft[field.key]}
+                    value={draft[field.key as keyof ActorDTO] ?? ''}
                     onChangeText={v => setValue(field.key, v)}
                     placeholder={field.placeholder}
                     placeholderTextColor={colors.text.tertiary}
                     autoCapitalize="none"
                   />
                 ) : (
-                  <Text style={[styles.fieldValue, !draft[field.key] && styles.fieldEmpty]}>
-                    {draft[field.key] || field.placeholder || '—'}
+                  <Text style={[styles.fieldValue, !(draft as Record<string, string>)[field.key] && styles.fieldEmpty]}>
+                    {(draft as Record<string, string>)[field.key] || field.placeholder || '—'}
                   </Text>
                 )}
               </View>
@@ -113,7 +126,7 @@ export function ProfileSheet({ visible, onClose }: Props) {
                   <GlassButton title="Cancel" onPress={cancel} variant="ghost" />
                 </View>
                 <View style={styles.footerHalf}>
-                  <GlassButton title="Save" onPress={save} variant="primary" />
+                  <GlassButton title={saving ? 'Saving...' : 'Save'} onPress={save} variant="primary" disabled={saving} />
                 </View>
               </View>
             ) : (

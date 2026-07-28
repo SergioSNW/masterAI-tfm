@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import type { Round, Submission } from '../data/mock'
 import { UploadVideoModal } from '../components/UploadVideoModal'
+import { DocumentUploadZone } from '../components/DocumentUploadZone'
 import { reviewSubmission } from '../services/submissionService'
 import { fetchComments, createComment } from '../services/commentService'
 import type { CommentDTO } from '../services/commentService'
-import { fetchAttachments, addAttachment, downloadAttachment } from '../services/attachmentService'
+import { fetchAttachments, addAttachment, removeAttachment } from '../services/attachmentService'
 import type { AttachmentDTO } from '../services/attachmentService'
+import { toast } from 'sonner'
+import { upload } from '@vercel/blob/client'
 
 interface Props {
   round: Round
@@ -23,6 +26,7 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentDTO[]>([])
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     setAttachmentsLoading(true)
@@ -54,30 +58,34 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
     setCommentInput('')
   }
 
-  async function handleAddAttachment() {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.pdf,.png,.jpg,.jpeg,.txt'
-    input.onchange = async (e: Event) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (!file) return
-      if (file.size > 10 * 1024 * 1024) return
-
-      const reader = new FileReader()
-      reader.onload = async () => {
-        const base64 = (reader.result as string).split(',')[1]
-        const attachment = await addAttachment({
-          roundId: round.id,
-          fileName: file.name,
-          fileType: file.type,
-          fileData: base64,
-          fileSize: file.size,
-        })
-        setAttachments(prev => [attachment, ...prev])
-      }
-      reader.readAsDataURL(file)
+  async function handleUpload(file: File) {
+    setUploading(true)
+    try {
+      const { url } = await upload(file.name, file, {
+        handleUploadUrl: '/api/upload',
+        access: 'public',
+      })
+      const attachment = await addAttachment({
+        roundId: round.id,
+        fileName: file.name,
+        fileType: file.type || 'application/octet-stream',
+        url,
+        fileSize: file.size,
+      })
+      setAttachments(prev => [attachment, ...prev])
+      toast.success('File uploaded')
+    } catch (err) {
+      toast.error('Upload failed')
+      console.error(err)
+    } finally {
+      setUploading(false)
     }
-    input.click()
+  }
+
+  async function handleRemove(id: string) {
+    setAttachments(prev => prev.filter(a => a.id !== id))
+    await removeAttachment(id)
+    toast.success('File removed')
   }
 
   async function handleReview(submissionId: string, status: 'shortlisted' | 'reviewed' | 'rejected') {
@@ -135,41 +143,21 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
         ))}
       </div>
 
-      <div className="detail-section">
+      <div className="detail-section" style={{ marginBottom: 32 }}>
         <div className="detail-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Attachments {attachments.length > 0 && `(${attachments.length})`}</h2>
-          {round.status === 'open' && (
-            <button className="btn btn-primary" onClick={handleAddAttachment} style={{ fontSize: 13, padding: '6px 14px' }}>
-              + Upload File
-            </button>
-          )}
         </div>
+
         {attachmentsLoading ? (
           <div style={{ fontSize: 13, color: 'var(--text-tertiary)', padding: '8px 0' }}>Loading attachments...</div>
-        ) : attachments.length === 0 ? (
-          <div className="glass" style={{ padding: '20px', borderRadius: 'var(--radius-md)', textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>📄</div>
-            <p style={{ fontSize: 14, color: 'var(--text-tertiary)', margin: 0 }}>No attachments yet. Upload scripts, contracts, or reference materials.</p>
-          </div>
         ) : (
-          <div style={{ marginBottom: 24 }}>
-            {attachments.map(a => (
-              <div key={a.id} className="glass" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', marginBottom: 8, borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 20 }}>{a.fileType === 'application/pdf' ? '📕' : '📎'}</span>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>{a.fileName}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-                      {(a.fileSize / 1024).toFixed(1)} KB · {new Date(a.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-                <button className="btn btn-ghost" onClick={() => downloadAttachment(a)} style={{ fontSize: 13, padding: '4px 12px' }}>
-                  Download
-                </button>
-              </div>
-            ))}
-          </div>
+          <DocumentUploadZone
+            attachments={attachments}
+            uploading={uploading}
+            onUpload={handleUpload}
+            onRemove={handleRemove}
+            disabled={round.status !== 'open'}
+          />
         )}
       </div>
 
