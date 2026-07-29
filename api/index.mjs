@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// api/index.ts
+// api/_index.ts
 import { handleUpload } from "@vercel/blob/client";
 
 // packages/database/src/client.ts
@@ -4703,7 +4703,7 @@ var ListAttachmentsUseCase = class {
   }
 };
 
-// api/index.ts
+// api/_index.ts
 var ALLOWED_TYPES = [
   "application/pdf",
   "image/png",
