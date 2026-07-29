@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "postinstall": "prisma generate --schema=./database/schema.prisma",
+    "build": "tsc",
     "prisma:generate": "prisma generate --schema=./database/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema=./database/schema.prisma",
     "typecheck": "tsc --noEmit",
