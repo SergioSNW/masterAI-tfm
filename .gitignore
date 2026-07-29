@@ -7,5 +7,4 @@ playwright-report/
 ARCHITECTURE_TEXTBOOK.md
 .vercel
 .env*
-api/index.mjs
 .env.local
