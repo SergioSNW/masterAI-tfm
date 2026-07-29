@@ -46,11 +46,22 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
+.glass input,
+.glass textarea,
+.glass button,
+.glass select,
+.glass a {
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+}
+
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
+  isolation: isolate;
 }
 
 .glass-strong {
@@ -58,6 +69,7 @@ body {
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--glass-border);
+  isolation: isolate;
 }
 
 .glass-hover {

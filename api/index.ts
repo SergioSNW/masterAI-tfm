@@ -1,0 +1,290 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { handleUpload } from '@vercel/blob/client'
+import {
+  CreateActorSchema,
+  CreateCastingSchema,
+  CloseCastingSchema,
+  CreateProjectSchema,
+  CloseProjectSchema,
+  CreateRoundSchema,
+  OpenRoundSchema,
+  CloseRoundSchema,
+  AddAttachmentSchema,
+  ListAttachmentsSchema,
+  ManualUploadSchema,
+  ReviewSubmissionSchema,
+  CreateCommentSchema,
+  ListCommentsSchema,
+} from '@masterai/infrastructure'
+import {
+  CreateActorUseCase,
+  ListActorsUseCase,
+  CreateCastingUseCase,
+  CloseCastingUseCase,
+  CreateProjectUseCase,
+  CloseProjectUseCase,
+  CreateRoundUseCase,
+  OpenRoundUseCase,
+  CloseRoundUseCase,
+  AddAttachmentUseCase,
+  ListAttachmentsUseCase,
+  ManualUploadUseCase,
+  ReviewSubmissionUseCase,
+  CreateCommentUseCase,
+  ListCommentsUseCase,
+} from '@masterai/core'
+import {
+  PrismaActorRepository,
+  PrismaCastingRepository,
+  PrismaProjectRepository,
+  PrismaDirectorRepository,
+  PrismaRoundRepository,
+  PrismaAttachmentRepository,
+  PrismaSubmissionRepository,
+  PrismaCommentRepository,
+} from '@masterai/infrastructure/repositories'
+
+/* ── Blob upload config ── */
+
+const ALLOWED_TYPES = [
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'text/plain',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'video/mp4',
+  'video/quicktime',
+  'video/webm',
+]
+
+const MAX_SIZE_BYTES = 50 * 1024 * 1024
+
+/* ── Route matching ── */
+
+type Handler = (req: VercelRequest, res: VercelResponse, params: Record<string, string>) => unknown
+
+interface Route {
+  method: string
+  match: RegExp
+  paramNames: string[]
+  handler: Handler
+}
+
+function defineRoute(method: string, path: string, handler: Handler): Route {
+  const paramNames: string[] = []
+  const pattern = path.replace(/:([a-zA-Z]+)/g, (_, name) => {
+    paramNames.push(name)
+    return '([^/]+)'
+  })
+  return { method, match: new RegExp(`^${pattern}$`), paramNames, handler }
+}
+
+const routes: Route[] = [
+  defineRoute('POST', '/api/upload', handleUploadRoute),
+
+  defineRoute('GET', '/api/actors', listActors),
+  defineRoute('POST', '/api/actors/create', createActor),
+
+  defineRoute('POST', '/api/projects/create', createProject),
+  defineRoute('POST', '/api/projects/close', closeProject),
+
+  defineRoute('POST', '/api/castings/create', createCasting),
+  defineRoute('POST', '/api/castings/close', closeCasting),
+
+  defineRoute('POST', '/api/rounds/create', createRound),
+  defineRoute('POST', '/api/rounds/open', openRound),
+  defineRoute('POST', '/api/rounds/close', closeRound),
+  defineRoute('POST', '/api/rounds/attachment', addAttachment),
+  defineRoute('GET', '/api/rounds/attachments', listAttachments),
+  defineRoute('DELETE', '/api/rounds/attachment/:id', removeAttachment),
+
+  defineRoute('POST', '/api/submissions/upload', uploadSubmission),
+  defineRoute('POST', '/api/submissions/review', reviewSubmission),
+  defineRoute('POST', '/api/submissions/comment', createComment),
+  defineRoute('GET', '/api/submissions/comments', listComments),
+]
+
+/* ── Main entry ── */
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const url = new URL(req.url ?? '/', 'http://localhost')
+  const method = req.method ?? 'GET'
+  const pathname = url.pathname
+
+  for (const route of routes) {
+    if (route.method !== method) continue
+    const m = pathname.match(route.match)
+    if (!m) continue
+    const params: Record<string, string> = {}
+    route.paramNames.forEach((name, i) => {
+      params[name] = m[i + 1]
+    })
+    return route.handler(req, res, params)
+  }
+
+  return res.status(404).json({ error: `Not found: ${method} ${pathname}` })
+}
+
+/* ── Route handlers ── */
+
+async function handleUploadRoute(req: VercelRequest, res: VercelResponse) {
+  try {
+    const response = await handleUpload({
+      body: req.body,
+      request: req,
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
+        const payload: Record<string, unknown> = clientPayload ? JSON.parse(clientPayload) : {}
+        const { fileType, fileSize, fileName } = payload as { fileType?: string; fileSize?: number; fileName?: string }
+
+        if (!fileName?.trim()) throw new Error('File name is required')
+        if (!fileType || !ALLOWED_TYPES.includes(fileType)) throw new Error(`File type '${fileType}' is not supported`)
+        if (fileSize === undefined || fileSize > MAX_SIZE_BYTES) throw new Error(`File exceeds 50MB limit (${((fileSize ?? MAX_SIZE_BYTES + 1) / 1024 / 1024).toFixed(1)}MB)`)
+
+        return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: MAX_SIZE_BYTES, addRandomSuffix: true }
+      },
+    })
+    return res.status(200).json(response)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Upload request failed'
+    return res.status(400).json({ error: message })
+  }
+}
+
+async function listActors(req: VercelRequest, res: VercelResponse) {
+  const search = req.query.search as string | undefined
+  const useCase = new ListActorsUseCase(new PrismaActorRepository())
+  const result = await useCase.execute({ search })
+  if (!result.ok) return res.status(500).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function createActor(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateActorSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateActorUseCase(new PrismaActorRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(409).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function createProject(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateProjectSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateProjectUseCase(new PrismaProjectRepository(), new PrismaDirectorRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function closeProject(req: VercelRequest, res: VercelResponse) {
+  const parsed = CloseProjectSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CloseProjectUseCase(new PrismaProjectRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function createCasting(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateCastingSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateCastingUseCase(new PrismaCastingRepository(), new PrismaProjectRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function closeCasting(req: VercelRequest, res: VercelResponse) {
+  const parsed = CloseCastingSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CloseCastingUseCase(new PrismaCastingRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function createRound(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateRoundSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateRoundUseCase(new PrismaRoundRepository(), new PrismaCastingRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function openRound(req: VercelRequest, res: VercelResponse) {
+  const parsed = OpenRoundSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new OpenRoundUseCase(new PrismaRoundRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function closeRound(req: VercelRequest, res: VercelResponse) {
+  const parsed = CloseRoundSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CloseRoundUseCase(new PrismaRoundRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function addAttachment(req: VercelRequest, res: VercelResponse) {
+  const parsed = AddAttachmentSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new AddAttachmentUseCase(new PrismaAttachmentRepository(), new PrismaRoundRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function listAttachments(req: VercelRequest, res: VercelResponse) {
+  const parsed = ListAttachmentsSchema.safeParse(req.query)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new ListAttachmentsUseCase(new PrismaAttachmentRepository(), new PrismaRoundRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function removeAttachment(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  return res.status(200).json({ id: params.id, removed: true })
+}
+
+async function uploadSubmission(req: VercelRequest, res: VercelResponse) {
+  const parsed = ManualUploadSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new ManualUploadUseCase(new PrismaSubmissionRepository(), new PrismaRoundRepository(), new PrismaActorRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function reviewSubmission(req: VercelRequest, res: VercelResponse) {
+  const parsed = ReviewSubmissionSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new ReviewSubmissionUseCase(new PrismaSubmissionRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function createComment(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateCommentSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateCommentUseCase(new PrismaCommentRepository(), new PrismaSubmissionRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
+}
+
+async function listComments(req: VercelRequest, res: VercelResponse) {
+  const parsed = ListCommentsSchema.safeParse(req.query)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new ListCommentsUseCase(new PrismaCommentRepository(), new PrismaSubmissionRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}

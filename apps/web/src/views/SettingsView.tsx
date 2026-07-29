@@ -35,8 +35,8 @@ export function SettingsView() {
     fontSize: 14,
     outline: 'none',
     transition: 'border-color 200ms, box-shadow 200ms',
-    position: 'relative',
-    zIndex: 10,
+    // position: 'relative',
+    // zIndex: 10,
   }
 
   const textareaStyle: React.CSSProperties = {
@@ -136,7 +136,7 @@ export function SettingsView() {
               />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, zIndex: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4}}>
               <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
                 {saving ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
