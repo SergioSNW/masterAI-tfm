@@ -6,6 +6,7 @@ export interface ActorDTO {
   name: string
   phone?: string
   profilePictureUrl?: string
+  bio?: string
   createdAt: string
   updatedAt: string
 }
@@ -15,6 +16,7 @@ export interface CreateActorInput {
   name: string
   phone?: string
   profilePictureUrl?: string
+  bio?: string
 }
 
 let localActors: ActorDTO[] = []
@@ -35,7 +37,11 @@ export async function fetchActors(search?: string): Promise<ActorDTO[]> {
 export async function createActor(input: CreateActorInput): Promise<ActorDTO> {
   const newActor: ActorDTO = {
     id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-    ...input,
+    email: input.email,
+    name: input.name,
+    phone: input.phone,
+    profilePictureUrl: input.profilePictureUrl,
+    bio: input.bio,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
