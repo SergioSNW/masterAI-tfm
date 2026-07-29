@@ -9,3 +9,4 @@ ARCHITECTURE_TEXTBOOK.md
 .env*
 api/dist
 api/dist
+.env.local
