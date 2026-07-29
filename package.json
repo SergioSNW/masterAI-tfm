@@ -3,14 +3,15 @@
   "private": true,
   "workspaces": [
     "packages/core",
+    "packages/database",
     "packages/infrastructure",
     "api",
     "apps/web",
     "apps/mobile"
   ],
   "scripts": {
-    "prisma:generate": "npm run prisma:generate -w packages/infrastructure",
-    "prisma:migrate": "npm run prisma:migrate -w packages/infrastructure",
+    "prisma:generate": "npm run prisma:generate -w packages/database",
+    "prisma:migrate": "npm run prisma:migrate -w packages/database",
     "dev:web": "npm run dev -w apps/web",
     "build:api": "npx esbuild api/index.ts --bundle --platform=node --format=esm --external:@prisma/client --external:@vercel/blob --outfile=api/dist/index.mjs",
     "build:web": "npm run build:api && npm run build -w apps/web",
@@ -27,7 +28,9 @@
     "test:all": "npm test && npm run test:e2e",
     "maestro:studio": "maestro studio -w apps/mobile",
     "maestro:test": "maestro test apps/mobile/.maestro/",
-    "maestro:smoke": "maestro test apps/mobile/.maestro/ --include-tags=smoke"
+    "maestro:smoke": "maestro test apps/mobile/.maestro/ --include-tags=smoke",
+    "prisma:deploy": "npm run prisma:deploy -w packages/database",
+    "prisma:push": "npm run prisma:push -w packages/database"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

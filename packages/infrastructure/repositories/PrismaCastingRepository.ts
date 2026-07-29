@@ -1,6 +1,6 @@
 import type { Casting } from '@masterai/core'
 import type { ICastingRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaCastingRepository implements ICastingRepository {
   async findById(id: string): Promise<Casting | null> {

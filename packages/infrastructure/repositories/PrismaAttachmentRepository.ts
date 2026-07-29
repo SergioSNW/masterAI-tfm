@@ -1,6 +1,6 @@
 import type { Attachment } from '@masterai/core'
 import type { IAttachmentRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaAttachmentRepository implements IAttachmentRepository {
   async findById(id: string): Promise<Attachment | null> {

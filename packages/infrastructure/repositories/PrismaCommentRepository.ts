@@ -1,6 +1,6 @@
 import type { Comment } from '@masterai/core'
 import type { ICommentRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaCommentRepository implements ICommentRepository {
   async findById(id: string): Promise<Comment | null> {

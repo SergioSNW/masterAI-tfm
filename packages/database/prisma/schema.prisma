@@ -13,6 +13,7 @@ model Actor {
   name              String
   profilePictureUrl String?
   phone             String?
+  bio               String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -20,13 +21,15 @@ model Actor {
 }
 
 model Director {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  company   String?
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String
+  profilePictureUrl String?
+  company           String?
+  phone             String?
+  bio               String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   projects Project[]
 }

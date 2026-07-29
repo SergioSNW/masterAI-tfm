@@ -1,6 +1,6 @@
 import type { Actor } from '@masterai/core'
 import type { IActorRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaActorRepository implements IActorRepository {
   async findById(id: string): Promise<Actor | null> {

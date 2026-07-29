@@ -1,6 +1,7 @@
 export interface Profile {
   name: string
   email: string
+  profilePictureUrl?: string
   company?: string
   phone?: string
   bio?: string

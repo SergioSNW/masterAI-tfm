@@ -1,6 +1,6 @@
 import type { Round } from '@masterai/core'
 import type { IRoundRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaRoundRepository implements IRoundRepository {
   async findById(id: string): Promise<Round | null> {

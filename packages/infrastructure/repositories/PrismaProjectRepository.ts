@@ -1,6 +1,6 @@
 import type { Project } from '@masterai/core'
 import type { IProjectRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaProjectRepository implements IProjectRepository {
   async findById(id: string): Promise<Project | null> {

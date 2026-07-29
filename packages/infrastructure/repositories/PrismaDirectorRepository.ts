@@ -1,6 +1,6 @@
 import type { Director } from '@masterai/core'
 import type { IDirectorRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaDirectorRepository implements IDirectorRepository {
   async findById(id: string): Promise<Director | null> {

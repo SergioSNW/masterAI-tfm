@@ -4,6 +4,7 @@ export interface Actor {
   name: string
   profilePictureUrl?: string
   phone?: string
+  bio?: string
   createdAt: Date
   updatedAt: Date
 }

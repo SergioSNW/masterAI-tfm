@@ -1,6 +1,6 @@
 import type { Submission } from '@masterai/core'
 import type { ISubmissionRepository } from '@masterai/core'
-import { prisma } from '../database/client'
+import { prisma } from '@masterai/database'
 
 export class PrismaSubmissionRepository implements ISubmissionRepository {
   async findById(id: string): Promise<Submission | null> {

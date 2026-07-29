@@ -1,3 +1,3 @@
-export { prisma } from './database/client'
+export { prisma } from '@masterai/database'
 export * from './validation'
 export * from './repositories'
