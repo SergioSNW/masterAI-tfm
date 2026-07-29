@@ -4,6 +4,7 @@
       "maxDuration": 10
     }
   },
+  "framework": null,
   "buildCommand": "npm run build:web",
   "outputDirectory": "apps/web/dist",
   "installCommand": "npm install",
