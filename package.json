@@ -12,7 +12,7 @@
     "prisma:generate": "npm run prisma:generate -w packages/infrastructure",
     "prisma:migrate": "npm run prisma:migrate -w packages/infrastructure",
     "dev:web": "npm run dev -w apps/web",
-    "build:web": "npm run build -w packages/core && npm run build -w packages/infrastructure && npm run build -w apps/web",
+    "build:web": "npm run build -w apps/web",
     "dev:mobile": "npm run start -w apps/mobile",
     "dev:mobile:web": "npm run web -w apps/mobile",
     "test": "npm run test -w packages/core && npm run test -w packages/infrastructure && npm run test -w apps/web",
