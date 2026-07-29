@@ -7,6 +7,7 @@ import { ProjectDetailView } from './views/ProjectDetailView'
 import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
 import { ActorsView } from './views/ActorsView'
+import { ApiTestView } from './views/ApiTestView'
 import { SettingsView } from './views/SettingsView'
 import { DocsView } from './views/DocsView'
 import { HelpView } from './views/HelpView'
@@ -77,6 +78,8 @@ export default function App() {
         return <SettingsView />
       case 'docs':
         return <DocsView />
+      case 'api-test':
+        return <ApiTestView />
       case 'help':
         return <HelpView />
       default:

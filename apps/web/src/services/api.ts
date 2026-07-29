@@ -1,4 +1,4 @@
-const BASE = '/api'
+const BASE = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
 export interface ApiError {
   error: string | { fieldErrors: Record<string, string[]>; formErrors: string[] }
@@ -24,6 +24,10 @@ export function get<T>(url: string): Promise<T> {
 
 export function post<T>(url: string, body: unknown): Promise<T> {
   return request<T>(url, { method: 'POST', body: JSON.stringify(body) })
+}
+
+export function put<T>(url: string, body: unknown): Promise<T> {
+  return request<T>(url, { method: 'PUT', body: JSON.stringify(body) })
 }
 
 export function del<T = void>(url: string): Promise<T> {
