@@ -1,8 +1,7 @@
 {
   "functions": {
-    "api/index.ts": {
-      "maxDuration": 10,
-      "includeFiles": "packages/**"
+    "api/dist/index.mjs": {
+      "maxDuration": 10
     }
   },
   "framework": null,
@@ -10,7 +9,7 @@
   "outputDirectory": "apps/web/dist",
   "installCommand": "npm install",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.ts" },
+    { "source": "/api/(.*)", "destination": "/api/dist/index.mjs" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

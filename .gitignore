@@ -7,3 +7,4 @@ playwright-report/
 ARCHITECTURE_TEXTBOOK.md
 .vercel
 .env*
+api/dist
