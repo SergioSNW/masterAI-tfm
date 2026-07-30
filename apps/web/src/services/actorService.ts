@@ -43,16 +43,9 @@ export interface UpdateActorInput {
 let localActors: ActorDTO[] = []
 
 export async function fetchActors(search?: string): Promise<ActorDTO[]> {
-  const data = await get<ActorDTO[]>(`/actors${search ? `?search=${encodeURIComponent(search)}` : ''}`).catch(() => null)
-  if (data) {
-    localActors = data
-    return data
-  }
-  if (search) {
-    const q = search.toLowerCase()
-    return localActors.filter(a => a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q))
-  }
-  return localActors
+  const data = await get<ActorDTO[]>(`/actors${search ? `?search=${encodeURIComponent(search)}` : ''}`)
+  localActors = data
+  return data
 }
 
 export async function createActor(input: CreateActorInput): Promise<ActorDTO> {

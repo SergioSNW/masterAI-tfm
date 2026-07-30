@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Casting, Round } from '../data/mock'
@@ -13,9 +13,13 @@ interface Props {
 
 const PHASES = ['First Round', 'Callback', 'Closed']
 
-function PhaseDropdown({ castingId }: { castingId: string }) {
+function PhaseDropdown({ castingId, activePhase: initialPhase }: { castingId: string; activePhase?: string }) {
   const [open, setOpen] = useState(false)
-  const [phase, setPhase] = useState('First Round')
+  const [phase, setPhase] = useState(initialPhase || 'First Round')
+
+  useEffect(() => {
+    setPhase(initialPhase || 'First Round')
+  }, [initialPhase])
 
   async function handleChange(newPhase: string) {
     const prev = phase
@@ -79,7 +83,7 @@ export function CastingDetailView({ casting, onBack, onRoundClick, onRoundCreate
           <p>{casting.description}</p>
         </div>
         <div className="detail-header-right">
-          <PhaseDropdown castingId={casting.id} />
+          <PhaseDropdown castingId={casting.id} activePhase={(casting as any).activePhase} />
           <span className={`badge badge-${casting.status}`}>{casting.status}</span>
           {casting.status === 'open' && (
             <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ New Round</button>
