@@ -13,7 +13,7 @@
     "prisma:generate": "npm run prisma:generate -w packages/database",
     "prisma:migrate": "npm run prisma:migrate -w packages/database",
     "dev:web": "npm run dev -w apps/web",
-    "build:api": "npm run prisma:generate && npx esbuild api/router.ts --bundle --platform=node --format=esm --external:@prisma/client --external:@vercel/blob --outfile=api/router.mjs",
+    "build:api": "npm run build -w packages/core && npm run build -w packages/database && npm run build -w packages/infrastructure && npx esbuild api/router.ts --bundle --platform=node --format=esm --external:@prisma/client --external:@vercel/blob --outfile=api/router.mjs",
     "build:web": "npm run build:api && npm run build -w apps/web",
     "dev:mobile": "npm run start -w apps/mobile",
     "dev:mobile:web": "npm run web -w apps/mobile",
