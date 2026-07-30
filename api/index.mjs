@@ -4064,7 +4064,23 @@ var CreateActorSchema = external_exports.object({
   name: external_exports.string().min(1).max(200),
   phone: external_exports.string().max(30).optional(),
   profilePictureUrl: external_exports.string().url().optional(),
-  bio: external_exports.string().max(2e3).optional()
+  bio: external_exports.string().max(2e3).optional(),
+  agency: external_exports.string().max(200).optional(),
+  availability: external_exports.string().max(50).optional(),
+  preferredRoles: external_exports.string().max(500).optional(),
+  castingStage: external_exports.string().max(50).optional()
+});
+var UpdateActorSchema = external_exports.object({
+  id: external_exports.string().uuid(),
+  email: external_exports.string().email().optional(),
+  name: external_exports.string().min(1).max(200).optional(),
+  phone: external_exports.string().max(30).nullable().optional(),
+  profilePictureUrl: external_exports.string().url().nullable().optional(),
+  bio: external_exports.string().max(2e3).nullable().optional(),
+  agency: external_exports.string().max(200).nullable().optional(),
+  availability: external_exports.string().max(50).optional(),
+  preferredRoles: external_exports.string().max(500).nullable().optional(),
+  castingStage: external_exports.string().max(50).optional()
 });
 
 // packages/infrastructure/validation/projects.ts
@@ -4074,8 +4090,12 @@ var CreateProjectSchema = external_exports.object({
   description: external_exports.string().max(2e3).optional()
 });
 var CloseProjectSchema = external_exports.object({
-  projectId: external_exports.string().uuid(),
-  directorId: external_exports.string().uuid()
+  projectId: external_exports.string().min(1),
+  directorId: external_exports.string().min(1)
+});
+var UpdateProjectStatusSchema = external_exports.object({
+  projectId: external_exports.string().min(1),
+  status: external_exports.enum(["draft", "active", "closed"])
 });
 
 // packages/infrastructure/validation/castings.ts
@@ -4086,7 +4106,11 @@ var CreateCastingSchema = external_exports.object({
   requirements: external_exports.string().max(2e3).optional()
 });
 var CloseCastingSchema = external_exports.object({
-  castingId: external_exports.string().uuid()
+  castingId: external_exports.string().min(1)
+});
+var UpdateCastingPhaseSchema = external_exports.object({
+  castingId: external_exports.string().min(1),
+  activePhase: external_exports.string().min(1).max(100)
 });
 
 // packages/infrastructure/validation/rounds.ts
@@ -4366,6 +4390,23 @@ var CloseProjectUseCase = class {
   }
 };
 
+// packages/core/use-cases/projects/UpdateProjectStatusUseCase.ts
+var UpdateProjectStatusUseCase = class {
+  constructor(projectRepo) {
+    this.projectRepo = projectRepo;
+  }
+  projectRepo;
+  async execute(dto) {
+    const existing = await this.projectRepo.findById(dto.projectId);
+    if (!existing) {
+      return { ok: false, error: new Error("Project not found") };
+    }
+    const updated = { ...existing, status: dto.status, updatedAt: /* @__PURE__ */ new Date() };
+    const result = await this.projectRepo.update(updated);
+    return { ok: true, data: result };
+  }
+};
+
 // packages/core/use-cases/castings/CreateCastingUseCase.ts
 var CreateCastingUseCase = class {
   constructor(castingRepo, projectRepo) {
@@ -4389,6 +4430,7 @@ var CreateCastingUseCase = class {
       description: dto.description,
       requirements: dto.requirements,
       status: "open",
+      activePhase: "First Round",
       createdAt: /* @__PURE__ */ new Date(),
       updatedAt: /* @__PURE__ */ new Date()
     };
@@ -4414,6 +4456,23 @@ var CloseCastingUseCase = class {
     const updated = { ...casting, status: "closed", updatedAt: /* @__PURE__ */ new Date() };
     const saved = await this.castingRepo.update(updated);
     return { ok: true, data: saved };
+  }
+};
+
+// packages/core/use-cases/castings/UpdateCastingPhaseUseCase.ts
+var UpdateCastingPhaseUseCase = class {
+  constructor(castingRepo) {
+    this.castingRepo = castingRepo;
+  }
+  castingRepo;
+  async execute(dto) {
+    const existing = await this.castingRepo.findById(dto.castingId);
+    if (!existing) {
+      return { ok: false, error: new Error("Casting not found") };
+    }
+    const updated = { ...existing, activePhase: dto.activePhase, updatedAt: /* @__PURE__ */ new Date() };
+    const result = await this.castingRepo.update(updated);
+    return { ok: true, data: result };
   }
 };
 
@@ -4506,6 +4565,11 @@ var CreateActorUseCase = class {
       name: dto.name,
       phone: dto.phone,
       profilePictureUrl: dto.profilePictureUrl,
+      bio: dto.bio,
+      agency: dto.agency,
+      availability: dto.availability ?? "Available",
+      preferredRoles: dto.preferredRoles,
+      castingStage: dto.castingStage ?? "Pending",
       createdAt: /* @__PURE__ */ new Date(),
       updatedAt: /* @__PURE__ */ new Date()
     };
@@ -4523,6 +4587,57 @@ var ListActorsUseCase = class {
   async execute(dto) {
     const actors = await this.actorRepo.findMany(dto.search);
     return { ok: true, data: actors };
+  }
+};
+
+// packages/core/use-cases/actors/UpdateActorUseCase.ts
+var UpdateActorUseCase = class {
+  constructor(actorRepo) {
+    this.actorRepo = actorRepo;
+  }
+  actorRepo;
+  async execute(dto) {
+    const existing = await this.actorRepo.findById(dto.id);
+    if (!existing) {
+      return { ok: false, error: new Error("Actor not found") };
+    }
+    if (dto.email && dto.email !== existing.email) {
+      const duplicate = await this.actorRepo.findByEmail(dto.email);
+      if (duplicate) {
+        return { ok: false, error: new Error("An actor with this email already exists") };
+      }
+    }
+    const updated = {
+      ...existing,
+      ...dto.email !== void 0 && { email: dto.email },
+      ...dto.name !== void 0 && { name: dto.name },
+      ...dto.phone !== void 0 && { phone: dto.phone ?? void 0 },
+      ...dto.profilePictureUrl !== void 0 && { profilePictureUrl: dto.profilePictureUrl ?? void 0 },
+      ...dto.bio !== void 0 && { bio: dto.bio ?? void 0 },
+      ...dto.agency !== void 0 && { agency: dto.agency ?? void 0 },
+      ...dto.availability !== void 0 && { availability: dto.availability },
+      ...dto.preferredRoles !== void 0 && { preferredRoles: dto.preferredRoles ?? void 0 },
+      ...dto.castingStage !== void 0 && { castingStage: dto.castingStage },
+      updatedAt: /* @__PURE__ */ new Date()
+    };
+    const result = await this.actorRepo.update(updated);
+    return { ok: true, data: result };
+  }
+};
+
+// packages/core/use-cases/actors/DeleteActorUseCase.ts
+var DeleteActorUseCase = class {
+  constructor(actorRepo) {
+    this.actorRepo = actorRepo;
+  }
+  actorRepo;
+  async execute(id) {
+    const existing = await this.actorRepo.findById(id);
+    if (!existing) {
+      return { ok: false, error: new Error("Actor not found") };
+    }
+    await this.actorRepo.delete(id);
+    return { ok: true, data: void 0 };
   }
 };
 
@@ -4728,10 +4843,14 @@ var routes = [
   defineRoute("POST", "/api/upload", handleUploadRoute),
   defineRoute("GET", "/api/actors", listActors),
   defineRoute("POST", "/api/actors/create", createActor),
+  defineRoute("PUT", "/api/actors/:id", updateActor),
+  defineRoute("DELETE", "/api/actors/:id", deleteActor),
   defineRoute("POST", "/api/projects/create", createProject),
   defineRoute("POST", "/api/projects/close", closeProject),
+  defineRoute("PUT", "/api/projects/:id/status", updateProjectStatus),
   defineRoute("POST", "/api/castings/create", createCasting),
   defineRoute("POST", "/api/castings/close", closeCasting),
+  defineRoute("PUT", "/api/castings/:id/phase", updateCastingPhase),
   defineRoute("POST", "/api/rounds/create", createRound),
   defineRoute("POST", "/api/rounds/open", openRound),
   defineRoute("POST", "/api/rounds/close", closeRound),
@@ -4899,6 +5018,36 @@ async function listComments(req, res) {
   const useCase = new ListCommentsUseCase(new PrismaCommentRepository(), new PrismaSubmissionRepository());
   const result = await useCase.execute(parsed.data);
   if (!result.ok) return res.status(400).json({ error: result.error.message });
+  return res.status(200).json(result.data);
+}
+async function updateActor(req, res, params) {
+  const parsed = UpdateActorSchema.safeParse({ ...req.body, id: params.id });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const useCase = new UpdateActorUseCase(new PrismaActorRepository());
+  const result = await useCase.execute(parsed.data);
+  if (!result.ok) return res.status(404).json({ error: result.error.message });
+  return res.status(200).json(result.data);
+}
+async function deleteActor(req, res, params) {
+  const useCase = new DeleteActorUseCase(new PrismaActorRepository());
+  const result = await useCase.execute(params.id);
+  if (!result.ok) return res.status(404).json({ error: result.error.message });
+  return res.status(200).json({ id: params.id, deleted: true });
+}
+async function updateProjectStatus(req, res, params) {
+  const parsed = UpdateProjectStatusSchema.safeParse({ ...req.body, projectId: params.id });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const useCase = new UpdateProjectStatusUseCase(new PrismaProjectRepository());
+  const result = await useCase.execute(parsed.data);
+  if (!result.ok) return res.status(404).json({ error: result.error.message });
+  return res.status(200).json(result.data);
+}
+async function updateCastingPhase(req, res, params) {
+  const parsed = UpdateCastingPhaseSchema.safeParse({ ...req.body, castingId: params.id });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const useCase = new UpdateCastingPhaseUseCase(new PrismaCastingRepository());
+  const result = await useCase.execute(parsed.data);
+  if (!result.ok) return res.status(404).json({ error: result.error.message });
   return res.status(200).json(result.data);
 }
 export {

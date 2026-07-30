@@ -2,10 +2,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { handleUpload } from '@vercel/blob/client'
 import {
   CreateActorSchema,
+  UpdateActorSchema,
   CreateCastingSchema,
   CloseCastingSchema,
+  UpdateCastingPhaseSchema,
   CreateProjectSchema,
   CloseProjectSchema,
+  UpdateProjectStatusSchema,
   CreateRoundSchema,
   OpenRoundSchema,
   CloseRoundSchema,
@@ -18,11 +21,15 @@ import {
 } from '@masterai/infrastructure'
 import {
   CreateActorUseCase,
+  UpdateActorUseCase,
+  DeleteActorUseCase,
   ListActorsUseCase,
   CreateCastingUseCase,
   CloseCastingUseCase,
+  UpdateCastingPhaseUseCase,
   CreateProjectUseCase,
   CloseProjectUseCase,
+  UpdateProjectStatusUseCase,
   CreateRoundUseCase,
   OpenRoundUseCase,
   CloseRoundUseCase,
@@ -85,12 +92,16 @@ const routes: Route[] = [
 
   defineRoute('GET', '/api/actors', listActors),
   defineRoute('POST', '/api/actors/create', createActor),
+  defineRoute('PUT', '/api/actors/:id', updateActor),
+  defineRoute('DELETE', '/api/actors/:id', deleteActor),
 
   defineRoute('POST', '/api/projects/create', createProject),
   defineRoute('POST', '/api/projects/close', closeProject),
+  defineRoute('PUT', '/api/projects/:id/status', updateProjectStatus),
 
   defineRoute('POST', '/api/castings/create', createCasting),
   defineRoute('POST', '/api/castings/close', closeCasting),
+  defineRoute('PUT', '/api/castings/:id/phase', updateCastingPhase),
 
   defineRoute('POST', '/api/rounds/create', createRound),
   defineRoute('POST', '/api/rounds/open', openRound),
@@ -286,5 +297,41 @@ async function listComments(req: VercelRequest, res: VercelResponse) {
   const useCase = new ListCommentsUseCase(new PrismaCommentRepository(), new PrismaSubmissionRepository())
   const result = await useCase.execute(parsed.data)
   if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+/* ── New CRUD handlers ── */
+
+async function updateActor(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const parsed = UpdateActorSchema.safeParse({ ...req.body, id: params.id })
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new UpdateActorUseCase(new PrismaActorRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function deleteActor(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const useCase = new DeleteActorUseCase(new PrismaActorRepository())
+  const result = await useCase.execute(params.id)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
+  return res.status(200).json({ id: params.id, deleted: true })
+}
+
+async function updateProjectStatus(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const parsed = UpdateProjectStatusSchema.safeParse({ ...req.body, projectId: params.id })
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new UpdateProjectStatusUseCase(new PrismaProjectRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function updateCastingPhase(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const parsed = UpdateCastingPhaseSchema.safeParse({ ...req.body, castingId: params.id })
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new UpdateCastingPhaseUseCase(new PrismaCastingRepository())
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
   return res.status(200).json(result.data)
 }

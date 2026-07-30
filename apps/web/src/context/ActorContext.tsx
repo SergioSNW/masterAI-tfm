@@ -1,5 +1,14 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
-import { fetchActors, type ActorDTO } from '../services/actorService'
+import { toast } from 'sonner'
+import {
+  fetchActors,
+  createActor as apiCreateActor,
+  updateActor as apiUpdateActor,
+  deleteActor as apiDeleteActor,
+  type ActorDTO,
+  type CreateActorInput,
+  type UpdateActorInput,
+} from '../services/actorService'
 
 export type ViewMode = 'list' | 'grid'
 
@@ -13,6 +22,7 @@ interface ActorState {
   itemsPerPage: number
   totalPages: number
   selectedActor: ActorDTO | null
+  modalMode: 'view' | 'edit'
   loading: boolean
   error: string | null
 }
@@ -23,8 +33,11 @@ interface ActorActions {
   setSearchQuery: (query: string) => void
   setActiveLetter: (letter: string | null) => void
   setCurrentPage: (page: number) => void
-  selectActor: (actor: ActorDTO) => void
+  selectActor: (actor: ActorDTO, mode?: 'view' | 'edit') => void
   closeModal: () => void
+  createActor: (input: CreateActorInput) => Promise<void>
+  updateActor: (input: UpdateActorInput) => Promise<void>
+  deleteActor: (id: string) => Promise<void>
 }
 
 type ActorContextValue = ActorState & ActorActions
@@ -58,6 +71,7 @@ export function ActorProvider({ children }: { children: ReactNode }) {
   const [activeLetter, setActiveLetter] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedActor, setSelectedActor] = useState<ActorDTO | null>(null)
+  const [modalMode, setModalMode] = useState<'view' | 'edit'>('view')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const itemsPerPage = 12
@@ -92,8 +106,72 @@ export function ActorProvider({ children }: { children: ReactNode }) {
     setCurrentPage(1)
   }, [])
 
-  const selectActor = useCallback((actor: ActorDTO) => setSelectedActor(actor), [])
-  const closeModal = useCallback(() => setSelectedActor(null), [])
+  const selectActor = useCallback((actor: ActorDTO, mode: 'view' | 'edit' = 'view') => {
+    setSelectedActor(actor)
+    setModalMode(mode)
+  }, [])
+
+  const closeModal = useCallback(() => {
+    setSelectedActor(null)
+    setModalMode('view')
+  }, [])
+
+  const createActor = useCallback(async (input: CreateActorInput) => {
+    const optimistic: ActorDTO = {
+      id: `optimistic-${Date.now()}`,
+      email: input.email,
+      name: input.name,
+      phone: input.phone,
+      profilePictureUrl: input.profilePictureUrl,
+      bio: input.bio,
+      agency: input.agency,
+      availability: input.availability ?? 'Available',
+      preferredRoles: input.preferredRoles,
+      castingStage: input.castingStage ?? 'Pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    setActors(prev => [optimistic, ...prev])
+    try {
+      const created = await apiCreateActor(input)
+      setActors(prev => prev.map(a => a.id === optimistic.id ? created : a))
+      toast.success('Actor created')
+    } catch {
+      setActors(prev => prev.filter(a => a.id !== optimistic.id))
+      toast.error('Failed to create actor')
+      throw new Error('Failed to create actor')
+    }
+  }, [])
+
+  const updateActor = useCallback(async (input: UpdateActorInput) => {
+    const prev = actors
+    setActors(prevActors =>
+      prevActors.map(a => a.id === input.id ? { ...a, ...input, updatedAt: new Date().toISOString() } : a)
+    )
+    try {
+      const updated = await apiUpdateActor(input)
+      setActors(prevActors =>
+        prevActors.map(a => a.id === updated.id ? updated : a)
+      )
+      toast.success('Actor updated')
+    } catch {
+      setActors(prev)
+      toast.error('Failed to update actor')
+      throw new Error('Failed to update actor')
+    }
+  }, [actors])
+
+  const deleteActor = useCallback(async (id: string) => {
+    const prev = actors
+    setActors(prevActors => prevActors.filter(a => a.id !== id))
+    try {
+      await apiDeleteActor(id)
+      toast.success('Actor deleted')
+    } catch {
+      setActors(prev)
+      toast.error('Failed to delete actor')
+    }
+  }, [actors])
 
   return (
     <ActorContext.Provider
@@ -107,6 +185,7 @@ export function ActorProvider({ children }: { children: ReactNode }) {
         itemsPerPage,
         totalPages,
         selectedActor,
+        modalMode,
         loading,
         error,
         fetch,
@@ -116,6 +195,9 @@ export function ActorProvider({ children }: { children: ReactNode }) {
         setCurrentPage,
         selectActor,
         closeModal,
+        createActor,
+        updateActor,
+        deleteActor,
       }}
     >
       {children}

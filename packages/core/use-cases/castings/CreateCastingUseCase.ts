@@ -32,6 +32,7 @@ export class CreateCastingUseCase {
       description: dto.description,
       requirements: dto.requirements,
       status: 'open',
+      activePhase: 'First Round',
       createdAt: new Date(),
       updatedAt: new Date(),
     }

@@ -7,6 +7,11 @@ export const CreateProjectSchema = z.object({
 })
 
 export const CloseProjectSchema = z.object({
-  projectId: z.string().uuid(),
-  directorId: z.string().uuid(),
+  projectId: z.string().min(1),
+  directorId: z.string().min(1),
+})
+
+export const UpdateProjectStatusSchema = z.object({
+  projectId: z.string().min(1),
+  status: z.enum(['draft', 'active', 'closed']),
 })

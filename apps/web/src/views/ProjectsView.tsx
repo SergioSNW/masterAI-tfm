@@ -1,12 +1,57 @@
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import type { Project } from '../data/mock'
 import { CreateProjectModal } from '../components/CreateProjectModal'
 import type { CreateProjectInput } from '../services/projectService'
+import { useProjectContext } from '../context/ProjectContext'
 
 interface Props {
   projects: Project[]
   onProjectClick: (id: string) => void
   onProjectCreate: (data: CreateProjectInput) => Promise<void>
+}
+
+const STATUS_OPTIONS: Array<{ value: Project['status']; label: string }> = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'active', label: 'Open' },
+  { value: 'closed', label: 'Closed' },
+]
+
+function StatusBadge({ project }: { project: Project }) {
+  const { updateStatus } = useProjectContext()
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }} onClick={e => e.stopPropagation()}>
+      <button
+        className={`status-badge status-${project.status}`}
+        onClick={() => setOpen(!open)}
+      >
+        {project.status === 'active' ? 'Open' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+        <ChevronDown size={12} />
+      </button>
+      {open && (
+        <div
+          className="action-menu-dropdown"
+          style={{ top: '100%', left: 0, marginTop: 4, minWidth: 120 }}
+        >
+          {STATUS_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              className="action-menu-item"
+              onClick={() => {
+                updateStatus(project.id, opt.value)
+                setOpen(false)
+              }}
+            >
+              <span className={`stage-dot stage-${opt.value === 'active' ? 'first-round' : opt.value}`} />
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function ProjectsView({ projects, onProjectClick, onProjectCreate }: Props) {
@@ -41,7 +86,7 @@ export function ProjectsView({ projects, onProjectClick, onProjectCreate }: Prop
             className={`card glass glass-hover animate-in animate-in-d${i + 1}`}
             onClick={() => onProjectClick(project.id)}
           >
-            <span className={`badge badge-${project.status}`}>{project.status}</span>
+            <StatusBadge project={project} />
             <h3 className="card-title" style={{ marginTop: 12 }}>{project.title}</h3>
             <p className="card-sub">{project.description}</p>
             <div className="card-meta">

@@ -36,7 +36,7 @@ function openRound(): Round {
 }
 
 function actor(): Actor {
-  return { id: 'a1', email: 'actor@test.com', name: 'Test Actor', createdAt: new Date(), updatedAt: new Date() }
+  return { id: 'a1', email: 'actor@test.com', name: 'Test Actor', availability: 'Available', castingStage: 'Pending', createdAt: new Date(), updatedAt: new Date() }
 }
 
 const validBase64 = 'a'.repeat(1000)

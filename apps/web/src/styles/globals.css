@@ -858,6 +858,217 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Action Menu ── */
+.action-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.action-menu-trigger {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.action-menu-trigger:hover {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+}
+
+.action-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  min-width: 180px;
+  background: rgba(25, 25, 38, 0.98);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  z-index: 50;
+  box-shadow: var(--shadow-glass);
+  animation: fadeIn 150ms ease;
+}
+
+.action-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-menu-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-tertiary);
+  padding: 4px 8px 2px;
+}
+
+.action-menu-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 4px 0;
+}
+
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.action-menu-item:hover {
+  background: var(--glass-bg);
+}
+
+.action-menu-item.danger {
+  color: var(--danger);
+}
+
+.action-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ── Stage Badge ── */
+.stage-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stage-badge.stage-pending {
+  background: rgba(234, 179, 8, 0.15);
+  color: var(--warning);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.stage-badge.stage-first-round {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.stage-badge.stage-callback {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-2);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.stage-badge.stage-casted {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.stage-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stage-dot.stage-pending { background: var(--warning); }
+.stage-dot.stage-first-round { background: var(--accent-1); }
+.stage-dot.stage-callback { background: var(--accent-2); }
+.stage-dot.stage-casted { background: var(--success); }
+
+/* ── Edit Input ── */
+.edit-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+}
+
+.edit-input:focus {
+  border-color: var(--accent-1);
+}
+
+/* ── Danger Button ── */
+.btn-danger {
+  padding: 10px 20px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ── Project Status Badge ── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.status-badge:hover {
+  filter: brightness(1.2);
+}
+
+.status-badge.status-draft {
+  background: rgba(100, 100, 120, 0.2);
+  color: var(--text-tertiary);
+  border-color: rgba(100, 100, 120, 0.3);
+}
+
+.status-badge.status-active {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.status-closed {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
 /* ── Actors page inner layout ── */
 .content > div > .detail-header {
   margin-bottom: 8px;

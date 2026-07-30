@@ -1,8 +1,12 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, MoreHorizontal, Edit2, Trash2 } from 'lucide-react'
 import { useActorContext } from '../context/ActorContext'
 
+const STAGES = ['Pending', 'First Round', 'Callback', 'Casted']
+
 export function ActorGridView() {
-  const { filtered, loading, currentPage, totalPages, setCurrentPage, selectActor } = useActorContext()
+  const { filtered, loading, currentPage, totalPages, setCurrentPage, selectActor, updateActor, deleteActor } = useActorContext()
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   if (loading) {
     return <div className="empty-state"><h3>Loading...</h3></div>
@@ -38,9 +42,53 @@ export function ActorGridView() {
               </div>
             )}
             <div style={{ flex: 1 }}>
-              <h3 className="card-title">{actor.name}</h3>
-              <p className="card-sub">{actor.email}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <h3 className="card-title">{actor.name}</h3>
+                  <p className="card-sub">{actor.email}</p>
+                </div>
+                <div className="action-menu-wrapper" onClick={e => e.stopPropagation()}>
+                  <button className="action-menu-trigger" onClick={() => setOpenMenu(openMenu === actor.id ? null : actor.id)}>
+                    <MoreHorizontal size={16} />
+                  </button>
+                  {openMenu === actor.id && (
+                    <div className="action-menu-dropdown">
+                      <div className="action-menu-section">
+                        <span className="action-menu-label">Casting Stage</span>
+                        {STAGES.map(stage => (
+                          <button
+                            key={stage}
+                            className="action-menu-item"
+                            onClick={() => {
+                              updateActor({ id: actor.id, castingStage: stage })
+                              setOpenMenu(null)
+                            }}
+                          >
+                            <span className={`stage-dot stage-${stage.toLowerCase().replace(/\s+/g, '-')}`} />
+                            {stage}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="action-menu-divider" />
+                      <button className="action-menu-item" onClick={() => { selectActor(actor, 'edit'); setOpenMenu(null) }}>
+                        <Edit2 size={14} /> Edit
+                      </button>
+                      <button className="action-menu-item danger" onClick={() => {
+                        setOpenMenu(null)
+                        if (window.confirm('Are you sure you want to delete this actor?')) {
+                          deleteActor(actor.id)
+                        }
+                      }}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
+            <span className={`stage-badge stage-${(actor.castingStage ?? 'Pending').toLowerCase().replace(/\s+/g, '-')}`}>
+              {actor.castingStage ?? 'Pending'}
+            </span>
             {actor.phone && <div className="card-meta"><span>📞 {actor.phone}</span></div>}
             <div className="card-meta">
               <span>Joined {new Date(actor.createdAt).toLocaleDateString()}</span>

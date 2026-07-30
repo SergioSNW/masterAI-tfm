@@ -23,7 +23,7 @@ function mockRepos() {
 }
 
 function openCasting(): Casting {
-  return { id: 'c1', projectId: 'p1', roleName: 'Lead', status: 'open', createdAt: new Date(), updatedAt: new Date() }
+  return { id: 'c1', projectId: 'p1', roleName: 'Lead', status: 'open', activePhase: 'First Round', createdAt: new Date(), updatedAt: new Date() }
 }
 
 describe('CreateRoundUseCase', () => {

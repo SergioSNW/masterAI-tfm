@@ -7,6 +7,7 @@ export interface Casting {
   description?: string
   requirements?: string
   status: CastingStatus
+  activePhase: string
   createdAt: Date
   updatedAt: Date
 }

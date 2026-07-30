@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { getProfile } from './services/profileService'
+import { ProjectProvider } from './context/ProjectContext'
 import { ProjectsView } from './views/ProjectsView'
 import { ActorsView } from './views/ActorsView'
 import { SettingsView } from './views/SettingsView'
@@ -87,10 +88,12 @@ export default function App() {
           </div>
         </header>
         <div className="content">
-          <Routes>
-            <Route path="/actors" element={<ActorsView />} />
-            <Route path="*" element={<ProjectsView projects={projects} onProjectClick={(id) => navigate(`/project/${id}`)} onProjectCreate={handleProjectCreate} />} />
-          </Routes>
+          <ProjectProvider initial={projects}>
+            <Routes>
+              <Route path="/actors" element={<ActorsView />} />
+              <Route path="*" element={<ProjectsView projects={projects} onProjectClick={(id) => navigate(`/project/${id}`)} onProjectCreate={handleProjectCreate} />} />
+            </Routes>
+          </ProjectProvider>
         </div>
       </main>
     </div>

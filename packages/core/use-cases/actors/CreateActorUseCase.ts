@@ -7,6 +7,11 @@ export interface CreateActorDTO {
   name: string
   phone?: string
   profilePictureUrl?: string
+  bio?: string
+  agency?: string
+  availability?: string
+  preferredRoles?: string
+  castingStage?: string
 }
 
 export class CreateActorUseCase {
@@ -24,6 +29,11 @@ export class CreateActorUseCase {
       name: dto.name,
       phone: dto.phone,
       profilePictureUrl: dto.profilePictureUrl,
+      bio: dto.bio,
+      agency: dto.agency,
+      availability: dto.availability ?? 'Available',
+      preferredRoles: dto.preferredRoles,
+      castingStage: dto.castingStage ?? 'Pending',
       createdAt: new Date(),
       updatedAt: new Date(),
     }

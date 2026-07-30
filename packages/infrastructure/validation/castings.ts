@@ -8,5 +8,10 @@ export const CreateCastingSchema = z.object({
 })
 
 export const CloseCastingSchema = z.object({
-  castingId: z.string().uuid(),
+  castingId: z.string().min(1),
+})
+
+export const UpdateCastingPhaseSchema = z.object({
+  castingId: z.string().min(1),
+  activePhase: z.string().min(1).max(100),
 })

@@ -1,11 +1,52 @@
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import { toast } from 'sonner'
 import type { Casting, Round } from '../data/mock'
+import { updateCastingPhase } from '../services/castingService'
 
 interface Props {
   casting: Casting
   onBack: () => void
   onRoundClick: (id: string) => void
   onRoundCreate: (castingId: string, round: Round) => void
+}
+
+const PHASES = ['First Round', 'Callback', 'Closed']
+
+function PhaseDropdown({ castingId }: { castingId: string }) {
+  const [open, setOpen] = useState(false)
+  const [phase, setPhase] = useState('First Round')
+
+  async function handleChange(newPhase: string) {
+    const prev = phase
+    setPhase(newPhase)
+    setOpen(false)
+    try {
+      await updateCastingPhase(castingId, newPhase)
+      toast.success(`Phase changed to ${newPhase}`)
+    } catch {
+      setPhase(prev)
+      toast.error('Failed to update phase')
+    }
+  }
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <button className="status-badge status-active" onClick={() => setOpen(!open)}>
+        {phase} <ChevronDown size={12} />
+      </button>
+      {open && (
+        <div className="action-menu-dropdown" style={{ top: '100%', left: 0, marginTop: 4, minWidth: 120 }}>
+          {PHASES.map(p => (
+            <button key={p} className="action-menu-item" onClick={() => handleChange(p)}>
+              <span className={`stage-dot stage-${p.toLowerCase().replace(/\s+/g, '-')}`} />
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function CastingDetailView({ casting, onBack, onRoundClick, onRoundCreate }: Props) {
@@ -38,6 +79,7 @@ export function CastingDetailView({ casting, onBack, onRoundClick, onRoundCreate
           <p>{casting.description}</p>
         </div>
         <div className="detail-header-right">
+          <PhaseDropdown castingId={casting.id} />
           <span className={`badge badge-${casting.status}`}>{casting.status}</span>
           {casting.status === 'open' && (
             <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ New Round</button>

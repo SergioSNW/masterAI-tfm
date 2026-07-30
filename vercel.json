@@ -2,9 +2,9 @@
   "framework": null,
   "buildCommand": "npm run build:web",
   "outputDirectory": "apps/web/dist",
-  "installCommand": "npm install",
+  "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.mjs" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/api/index.mjs", "type": "backend" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

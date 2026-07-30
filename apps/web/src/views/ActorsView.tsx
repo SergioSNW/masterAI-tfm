@@ -1,22 +1,20 @@
 import { useState } from 'react'
-import { ActorProvider } from '../context/ActorContext'
+import { ActorProvider, useActorContext } from '../context/ActorContext'
 import { DashboardHeader } from '../components/DashboardHeader'
 import { AZIndex } from '../components/AZIndex'
 import { ActorListView } from '../components/ActorListView'
 import { ActorGridView } from '../components/ActorGridView'
 import { ActorModal } from '../components/ActorModal'
 import { CreateActorModal } from '../components/CreateActorModal'
-import { createActor, type CreateActorInput } from '../services/actorService'
-import { useActorContext } from '../context/ActorContext'
+import type { CreateActorInput } from '../services/actorService'
 
 function ActorsContent() {
-  const { viewMode, actors } = useActorContext()
+  const { viewMode, actors, createActor } = useActorContext()
   const [showCreate, setShowCreate] = useState(false)
 
   async function handleCreate(data: CreateActorInput) {
     await createActor(data)
     setShowCreate(false)
-    window.location.reload()
   }
 
   return (
