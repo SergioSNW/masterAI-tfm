@@ -18,6 +18,14 @@ import {
   ReviewSubmissionSchema,
   CreateCommentSchema,
   ListCommentsSchema,
+  PrismaActorRepository,
+  PrismaCastingRepository,
+  PrismaProjectRepository,
+  PrismaDirectorRepository,
+  PrismaRoundRepository,
+  PrismaAttachmentRepository,
+  PrismaSubmissionRepository,
+  PrismaCommentRepository,
 } from '@masterai/infrastructure'
 import {
   CreateActorUseCase,
@@ -40,16 +48,6 @@ import {
   CreateCommentUseCase,
   ListCommentsUseCase,
 } from '@masterai/core'
-import {
-  PrismaActorRepository,
-  PrismaCastingRepository,
-  PrismaProjectRepository,
-  PrismaDirectorRepository,
-  PrismaRoundRepository,
-  PrismaAttachmentRepository,
-  PrismaSubmissionRepository,
-  PrismaCommentRepository,
-} from '@masterai/infrastructure/repositories'
 
 /* ── Blob upload config ── */
 
