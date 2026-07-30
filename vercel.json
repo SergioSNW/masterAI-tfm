@@ -4,7 +4,7 @@
   "outputDirectory": "apps/web/dist",
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.mjs", "type": "backend" },
+    { "source": "/api/(.*)", "destination": "/api/index.mjs"},
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
