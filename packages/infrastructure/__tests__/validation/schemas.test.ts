@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { CreateActorSchema } from '../../validation/actors'
-import { CreateProjectSchema, CloseProjectSchema } from '../../validation/projects'
-import { CreateCastingSchema, CloseCastingSchema } from '../../validation/castings'
-import { CreateRoundSchema, OpenRoundSchema, CloseRoundSchema } from '../../validation/rounds'
-import { SubmitVideoSchema, ReviewSubmissionSchema, ManualUploadSchema } from '../../validation/submissions'
-import { CreateCommentSchema, ListCommentsSchema } from '../../validation/comments'
-import { AddAttachmentSchema, ListAttachmentsSchema } from '../../validation/attachments'
+import { CreateActorSchema } from '../../validation/actors.js'
+import { CreateProjectSchema, CloseProjectSchema } from '../../validation/projects.js'
+import { CreateCastingSchema, CloseCastingSchema } from '../../validation/castings.js'
+import { CreateRoundSchema, OpenRoundSchema, CloseRoundSchema } from '../../validation/rounds.js'
+import { SubmitVideoSchema, ReviewSubmissionSchema, ManualUploadSchema } from '../../validation/submissions.js'
+import { CreateCommentSchema, ListCommentsSchema } from '../../validation/comments.js'
+import { AddAttachmentSchema, ListAttachmentsSchema } from '../../validation/attachments.js'
 
 describe('CreateActorSchema', () => {
   it('accepts valid input', () => {
