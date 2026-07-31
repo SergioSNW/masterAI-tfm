@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ListCommentsUseCase } from '../../use-cases/comments/ListCommentsUseCase'
-import type { ICommentRepository, ISubmissionRepository } from '../../repositories'
-import type { Comment, Submission } from '../../entities'
+import { ListCommentsUseCase } from '../../use-cases/comments/ListCommentsUseCase.js'
+import type { ICommentRepository, ISubmissionRepository } from '../../repositories/index.js'
+import type { Comment, Submission } from '../../entities/index.js'
 
 describe('ListCommentsUseCase', () => {
   it('lists comments for a submission', async () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CreateProjectUseCase } from '../../use-cases/projects/CreateProjectUseCase'
-import type { IProjectRepository, IDirectorRepository } from '../../repositories'
-import type { Director, Project } from '../../entities'
+import { CreateProjectUseCase } from '../../use-cases/projects/CreateProjectUseCase.js'
+import type { IProjectRepository, IDirectorRepository } from '../../repositories/index.js'
+import type { Director, Project } from '../../entities/index.js'
 
 function mockRepos() {
   return {

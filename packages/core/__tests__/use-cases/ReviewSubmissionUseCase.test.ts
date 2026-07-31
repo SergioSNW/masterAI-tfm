@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ReviewSubmissionUseCase } from '../../use-cases/submissions/ReviewSubmissionUseCase'
-import type { ISubmissionRepository } from '../../repositories'
-import type { Submission } from '../../entities'
+import { ReviewSubmissionUseCase } from '../../use-cases/submissions/ReviewSubmissionUseCase.js'
+import type { ISubmissionRepository } from '../../repositories/index.js'
+import type { Submission } from '../../entities/index.js'
 
 describe('ReviewSubmissionUseCase', () => {
   it('reviews a pending submission as shortlisted', async () => {

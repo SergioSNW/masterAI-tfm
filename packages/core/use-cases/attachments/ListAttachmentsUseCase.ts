@@ -1,6 +1,6 @@
-import type { Attachment } from '../../entities'
-import type { IAttachmentRepository, IRoundRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Attachment } from '../../entities/index.js'
+import type { IAttachmentRepository, IRoundRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface ListAttachmentsDTO {
   roundId: string

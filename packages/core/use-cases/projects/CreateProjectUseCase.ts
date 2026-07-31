@@ -1,6 +1,6 @@
-import type { Project } from '../../entities'
-import type { IProjectRepository, IDirectorRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Project } from '../../entities/index.js'
+import type { IProjectRepository, IDirectorRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface CreateProjectDTO {
   directorId: string

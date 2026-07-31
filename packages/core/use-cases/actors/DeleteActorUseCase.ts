@@ -1,5 +1,5 @@
-import type { IActorRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { IActorRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export class DeleteActorUseCase {
   constructor(private readonly actorRepo: IActorRepository) {}

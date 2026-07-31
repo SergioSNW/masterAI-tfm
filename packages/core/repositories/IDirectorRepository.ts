@@ -1,4 +1,4 @@
-import type { Director } from '../entities'
+import type { Director } from '../entities/index.js'
 
 export interface IDirectorRepository {
   findById(id: string): Promise<Director | null>

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CreateActorUseCase } from '../../use-cases/actors/CreateActorUseCase'
-import type { IActorRepository } from '../../repositories'
-import type { Actor } from '../../entities'
+import { CreateActorUseCase } from '../../use-cases/actors/CreateActorUseCase.js'
+import type { IActorRepository } from '../../repositories/index.js'
+import type { Actor } from '../../entities/index.js'
 
 function mockRepo(overrides?: Partial<IActorRepository>): IActorRepository {
   return {

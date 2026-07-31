@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { UpdateActorUseCase } from '../../use-cases/actors/UpdateActorUseCase'
-import type { IActorRepository } from '../../repositories'
-import type { Actor } from '../../entities'
+import { UpdateActorUseCase } from '../../use-cases/actors/UpdateActorUseCase.js'
+import type { IActorRepository } from '../../repositories/index.js'
+import type { Actor } from '../../entities/index.js'
 
 function existingActor(): Actor {
   return {

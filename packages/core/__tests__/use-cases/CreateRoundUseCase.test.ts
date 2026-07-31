@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CreateRoundUseCase } from '../../use-cases/rounds/CreateRoundUseCase'
-import type { IRoundRepository, ICastingRepository } from '../../repositories'
-import type { Round, Casting } from '../../entities'
+import { CreateRoundUseCase } from '../../use-cases/rounds/CreateRoundUseCase.js'
+import type { IRoundRepository, ICastingRepository } from '../../repositories/index.js'
+import type { Round, Casting } from '../../entities/index.js'
 
 function mockRepos() {
   return {

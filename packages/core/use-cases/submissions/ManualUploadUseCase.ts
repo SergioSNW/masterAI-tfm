@@ -1,6 +1,6 @@
-import type { Submission } from '../../entities'
-import type { ISubmissionRepository, IRoundRepository, IActorRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Submission } from '../../entities/index.js'
+import type { ISubmissionRepository, IRoundRepository, IActorRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 const ALLOWED_EXTENSIONS = ['.mp4', '.mov', '.webm']
 const MAX_SIZE_BYTES = 5 * 1024 * 1024

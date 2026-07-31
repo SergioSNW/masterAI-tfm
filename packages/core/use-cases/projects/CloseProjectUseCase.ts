@@ -1,6 +1,6 @@
-import type { Project } from '../../entities'
-import type { IProjectRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Project } from '../../entities/index.js'
+import type { IProjectRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface CloseProjectDTO {
   projectId: string

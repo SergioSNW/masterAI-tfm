@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CloseRoundUseCase } from '../../use-cases/rounds/CloseRoundUseCase'
-import type { IRoundRepository } from '../../repositories'
-import type { Round } from '../../entities'
+import { CloseRoundUseCase } from '../../use-cases/rounds/CloseRoundUseCase.js'
+import type { IRoundRepository } from '../../repositories/index.js'
+import type { Round } from '../../entities/index.js'
 
 describe('CloseRoundUseCase', () => {
   it('closes an open round', async () => {

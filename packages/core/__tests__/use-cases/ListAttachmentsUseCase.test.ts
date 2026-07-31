@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ListAttachmentsUseCase } from '../../use-cases/attachments/ListAttachmentsUseCase'
-import type { IAttachmentRepository, IRoundRepository } from '../../repositories'
-import type { Attachment, Round } from '../../entities'
+import { ListAttachmentsUseCase } from '../../use-cases/attachments/ListAttachmentsUseCase.js'
+import type { IAttachmentRepository, IRoundRepository } from '../../repositories/index.js'
+import type { Attachment, Round } from '../../entities/index.js'
 
 describe('ListAttachmentsUseCase', () => {
   it('lists attachments for a round', async () => {

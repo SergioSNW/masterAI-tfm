@@ -1,6 +1,6 @@
-import type { Comment } from '../../entities'
-import type { ICommentRepository, ISubmissionRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Comment } from '../../entities/index.js'
+import type { ICommentRepository, ISubmissionRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface ListCommentsDTO {
   submissionId: string

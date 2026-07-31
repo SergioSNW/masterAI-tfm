@@ -1,4 +1,4 @@
-import type { Actor } from '../entities'
+import type { Actor } from '../entities/index.js'
 
 export interface IActorRepository {
   findById(id: string): Promise<Actor | null>

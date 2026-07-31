@@ -1,6 +1,6 @@
-import type { Round } from '../../entities'
-import type { IRoundRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Round } from '../../entities/index.js'
+import type { IRoundRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface CloseRoundDTO {
   roundId: string

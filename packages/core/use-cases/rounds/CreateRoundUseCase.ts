@@ -1,6 +1,6 @@
-import type { Round } from '../../entities'
-import type { IRoundRepository, ICastingRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Round } from '../../entities/index.js'
+import type { IRoundRepository, ICastingRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface CreateRoundDTO {
   castingId: string

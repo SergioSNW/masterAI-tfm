@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { UpdateProjectStatusUseCase } from '../../use-cases/projects/UpdateProjectStatusUseCase'
-import type { IProjectRepository } from '../../repositories'
-import type { Project } from '../../entities'
+import { UpdateProjectStatusUseCase } from '../../use-cases/projects/UpdateProjectStatusUseCase.js'
+import type { IProjectRepository } from '../../repositories/index.js'
+import type { Project } from '../../entities/index.js'
 
 function existingProject(): Project {
   return {

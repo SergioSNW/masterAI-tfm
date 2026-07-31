@@ -1,4 +1,4 @@
-import type { Project } from '../entities'
+import type { Project } from '../entities/index.js'
 
 export interface IProjectRepository {
   findById(id: string): Promise<Project | null>

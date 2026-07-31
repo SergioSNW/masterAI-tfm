@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CloseCastingUseCase } from '../../use-cases/castings/CloseCastingUseCase'
-import type { ICastingRepository } from '../../repositories'
-import type { Casting } from '../../entities'
+import { CloseCastingUseCase } from '../../use-cases/castings/CloseCastingUseCase.js'
+import type { ICastingRepository } from '../../repositories/index.js'
+import type { Casting } from '../../entities/index.js'
 
 describe('CloseCastingUseCase', () => {
   it('closes an open casting', async () => {

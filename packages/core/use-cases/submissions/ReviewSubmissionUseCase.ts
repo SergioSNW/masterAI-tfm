@@ -1,6 +1,6 @@
-import type { Submission, SubmissionStatus } from '../../entities'
-import type { ISubmissionRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Submission, SubmissionStatus } from '../../entities/index.js'
+import type { ISubmissionRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface ReviewSubmissionDTO {
   submissionId: string

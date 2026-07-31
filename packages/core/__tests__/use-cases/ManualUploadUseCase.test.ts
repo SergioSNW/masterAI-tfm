@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ManualUploadUseCase } from '../../use-cases/submissions/ManualUploadUseCase'
-import type { ISubmissionRepository, IRoundRepository, IActorRepository } from '../../repositories'
-import type { Round, Actor, Submission } from '../../entities'
+import { ManualUploadUseCase } from '../../use-cases/submissions/ManualUploadUseCase.js'
+import type { ISubmissionRepository, IRoundRepository, IActorRepository } from '../../repositories/index.js'
+import type { Round, Actor, Submission } from '../../entities/index.js'
 
 function mockRepos() {
   return {

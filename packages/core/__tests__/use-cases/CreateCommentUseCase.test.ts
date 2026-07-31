@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CreateCommentUseCase } from '../../use-cases/comments/CreateCommentUseCase'
-import type { ICommentRepository, ISubmissionRepository } from '../../repositories'
-import type { Comment, Submission } from '../../entities'
+import { CreateCommentUseCase } from '../../use-cases/comments/CreateCommentUseCase.js'
+import type { ICommentRepository, ISubmissionRepository } from '../../repositories/index.js'
+import type { Comment, Submission } from '../../entities/index.js'
 
 function mockRepos() {
   return {

@@ -1,6 +1,6 @@
-import type { Casting } from '../../entities'
-import type { ICastingRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Casting } from '../../entities/index.js'
+import type { ICastingRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface UpdateCastingPhaseDTO {
   castingId: string

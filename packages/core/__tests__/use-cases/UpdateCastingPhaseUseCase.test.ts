@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { UpdateCastingPhaseUseCase } from '../../use-cases/castings/UpdateCastingPhaseUseCase'
-import type { ICastingRepository } from '../../repositories'
-import type { Casting } from '../../entities'
+import { UpdateCastingPhaseUseCase } from '../../use-cases/castings/UpdateCastingPhaseUseCase.js'
+import type { ICastingRepository } from '../../repositories/index.js'
+import type { Casting } from '../../entities/index.js'
 
 function existingCasting(): Casting {
   return {

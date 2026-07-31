@@ -1,4 +1,4 @@
-import type { Casting } from '../entities'
+import type { Casting } from '../entities/index.js'
 
 export interface ICastingRepository {
   findById(id: string): Promise<Casting | null>

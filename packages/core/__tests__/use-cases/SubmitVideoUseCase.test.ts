@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { SubmitVideoUseCase } from '../../use-cases/submissions/SubmitVideoUseCase'
-import type { IRoundRepository, IActorRepository, ISubmissionRepository } from '../../repositories'
-import type { Round, Actor, Submission } from '../../entities'
+import { SubmitVideoUseCase } from '../../use-cases/submissions/SubmitVideoUseCase.js'
+import type { IRoundRepository, IActorRepository, ISubmissionRepository } from '../../repositories/index.js'
+import type { Round, Actor, Submission } from '../../entities/index.js'
 
 function mockRepos(overrides?: {
   round?: Partial<IRoundRepository>

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { AddAttachmentUseCase } from '../../use-cases/attachments/AddAttachmentUseCase'
-import type { IAttachmentRepository, IRoundRepository } from '../../repositories'
-import type { Attachment, Round } from '../../entities'
+import { AddAttachmentUseCase } from '../../use-cases/attachments/AddAttachmentUseCase.js'
+import type { IAttachmentRepository, IRoundRepository } from '../../repositories/index.js'
+import type { Attachment, Round } from '../../entities/index.js'
 
 function mockRepos() {
   return {

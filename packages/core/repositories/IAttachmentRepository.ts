@@ -1,4 +1,4 @@
-import type { Attachment } from '../entities'
+import type { Attachment } from '../entities/index.js'
 
 export interface IAttachmentRepository {
   findById(id: string): Promise<Attachment | null>

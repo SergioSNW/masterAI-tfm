@@ -1,4 +1,4 @@
-import type { Round } from '../entities'
+import type { Round } from '../entities/index.js'
 
 export interface IRoundRepository {
   findById(id: string): Promise<Round | null>

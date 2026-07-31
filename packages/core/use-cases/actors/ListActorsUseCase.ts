@@ -1,6 +1,6 @@
-import type { Actor } from '../../entities'
-import type { IActorRepository } from '../../repositories'
-import type { Result } from '../types'
+import type { Actor } from '../../entities/index.js'
+import type { IActorRepository } from '../../repositories/index.js'
+import type { Result } from '../types.js'
 
 export interface ListActorsDTO {
   search?: string

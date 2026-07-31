@@ -1,4 +1,4 @@
-import type { Submission } from '../entities'
+import type { Submission } from '../entities/index.js'
 
 export interface ISubmissionRepository {
   findById(id: string): Promise<Submission | null>

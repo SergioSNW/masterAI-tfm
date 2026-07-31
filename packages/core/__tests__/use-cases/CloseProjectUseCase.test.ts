@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CloseProjectUseCase } from '../../use-cases/projects/CloseProjectUseCase'
-import type { IProjectRepository } from '../../repositories'
-import type { Project } from '../../entities'
+import { CloseProjectUseCase } from '../../use-cases/projects/CloseProjectUseCase.js'
+import type { IProjectRepository } from '../../repositories/index.js'
+import type { Project } from '../../entities/index.js'
 
 describe('CloseProjectUseCase', () => {
   it('closes an active project', async () => {
