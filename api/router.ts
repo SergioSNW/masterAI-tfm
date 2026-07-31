@@ -117,6 +117,7 @@ const routes: Route[] = [
 /* ── Main entry ── */
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log({ method: req.method, url: req.url })
   const url = new URL(req.url ?? '/', 'http://localhost')
   const method = req.method ?? 'GET'
   const pathname = url.pathname
