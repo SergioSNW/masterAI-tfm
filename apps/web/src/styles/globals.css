@@ -1013,6 +1013,15 @@ body {
   border-color: var(--accent-1);
 }
 
+select.edit-input {
+  color-scheme: dark;
+}
+
+select.edit-input option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 /* ── Danger Button ── */
 .btn-danger {
   padding: 10px 20px;
