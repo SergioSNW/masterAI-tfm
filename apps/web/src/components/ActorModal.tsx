@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X, Mail, Phone, Calendar, FileText, Building, ListTodo, Star, RefreshCw } from 'lucide-react'
 import { useActorContext } from '../context/ActorContext'
 import type { UpdateActorInput } from '../services/actorService'
@@ -6,6 +6,14 @@ import type { UpdateActorInput } from '../services/actorService'
 export function ActorModal() {
   const { selectedActor: actor, modalMode, closeModal, updateActor, deleteActor } = useActorContext()
   const [editMode, setEditMode] = useState(modalMode === 'edit')
+
+  useEffect(() => {
+    if (!actor) {
+      setEditMode(false)
+    } else {
+      setEditMode(modalMode === 'edit')
+    }
+  }, [actor, modalMode])
 
   if (!actor) return null
   const a = actor!

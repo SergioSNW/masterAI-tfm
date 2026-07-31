@@ -21,6 +21,12 @@ function StatusBadge({ project }: { project: Project }) {
   const { updateStatus } = useProjectContext()
   const [open, setOpen] = useState(false)
 
+  const dotClass: Record<Project['status'], string> = {
+    draft: 'stage-pending',
+    active: 'stage-first-round',
+    closed: 'stage-casted',
+  }
+
   return (
     <div style={{ position: 'relative', display: 'inline-block' }} onClick={e => e.stopPropagation()}>
       <button
@@ -44,7 +50,9 @@ function StatusBadge({ project }: { project: Project }) {
                 setOpen(false)
               }}
             >
-              <span className={`stage-dot stage-${opt.value === 'active' ? 'first-round' : opt.value}`} />
+              {opt.value === project.status && (
+                <span className={`stage-dot ${dotClass[opt.value]}`} />
+              )}
               {opt.label}
             </button>
           ))}
