@@ -7,6 +7,7 @@ describe('CloseProjectUseCase', () => {
   it('closes an active project', async () => {
     const repo: IProjectRepository = {
       findById: vi.fn().mockResolvedValue({ id: 'p1', directorId: 'd1', title: 'Test', status: 'active', createdAt: new Date(), updatedAt: new Date() } as Project),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn(),
       update: vi.fn().mockImplementation(async (p: Project) => p),
@@ -23,6 +24,7 @@ describe('CloseProjectUseCase', () => {
   it('rejects if project not found', async () => {
     const repo: IProjectRepository = {
       findById: vi.fn().mockResolvedValue(null),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -39,6 +41,7 @@ describe('CloseProjectUseCase', () => {
   it('rejects if not authorized', async () => {
     const repo: IProjectRepository = {
       findById: vi.fn().mockResolvedValue({ id: 'p1', directorId: 'd1', title: 'Test', status: 'active', createdAt: new Date(), updatedAt: new Date() } as Project),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -55,6 +58,7 @@ describe('CloseProjectUseCase', () => {
   it('rejects if already closed', async () => {
     const repo: IProjectRepository = {
       findById: vi.fn().mockResolvedValue({ id: 'p1', directorId: 'd1', title: 'Test', status: 'closed', createdAt: new Date(), updatedAt: new Date() } as Project),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),

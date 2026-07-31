@@ -36,6 +36,7 @@ import {
   CloseCastingUseCase,
   UpdateCastingPhaseUseCase,
   CreateProjectUseCase,
+  ListProjectsUseCase,
   CloseProjectUseCase,
   UpdateProjectStatusUseCase,
   CreateRoundUseCase,
@@ -93,6 +94,7 @@ const routes: Route[] = [
   defineRoute('PUT', '/api/actors/:id', updateActor),
   defineRoute('DELETE', '/api/actors/:id', deleteActor),
 
+  defineRoute('GET', '/api/projects', listProjects),
   defineRoute('POST', '/api/projects/create', createProject),
   defineRoute('POST', '/api/projects/close', closeProject),
   defineRoute('PUT', '/api/projects/:id/status', updateProjectStatus),
@@ -176,6 +178,13 @@ async function createActor(req: VercelRequest, res: VercelResponse) {
   const result = await useCase.execute(parsed.data)
   if (!result.ok) return res.status(409).json({ error: result.error.message })
   return res.status(201).json(result.data)
+}
+
+async function listProjects(req: VercelRequest, res: VercelResponse) {
+  const useCase = new ListProjectsUseCase(new PrismaProjectRepository())
+  const result = await useCase.execute()
+  if (!result.ok) return res.status(500).json({ error: result.error.message })
+  return res.status(200).json(result.data)
 }
 
 async function createProject(req: VercelRequest, res: VercelResponse) {

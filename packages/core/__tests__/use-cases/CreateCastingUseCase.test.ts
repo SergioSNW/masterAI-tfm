@@ -14,6 +14,7 @@ function mockRepos() {
     } as ICastingRepository,
     projectRepo: {
       findById: vi.fn(),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),

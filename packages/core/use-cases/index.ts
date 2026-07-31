@@ -2,6 +2,7 @@ export type { Result } from './types.js'
 
 export { CreateProjectUseCase } from './projects/CreateProjectUseCase.js'
 export type { CreateProjectDTO } from './projects/CreateProjectUseCase.js'
+export { ListProjectsUseCase } from './projects/ListProjectsUseCase.js'
 export { CloseProjectUseCase } from './projects/CloseProjectUseCase.js'
 export type { CloseProjectDTO } from './projects/CloseProjectUseCase.js'
 export { UpdateProjectStatusUseCase } from './projects/UpdateProjectStatusUseCase.js'

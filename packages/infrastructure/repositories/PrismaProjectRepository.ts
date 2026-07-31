@@ -7,6 +7,10 @@ export class PrismaProjectRepository implements IProjectRepository {
     return prisma.project.findUnique({ where: { id } }) as Promise<Project | null>
   }
 
+  async findAll(): Promise<Project[]> {
+    return prisma.project.findMany({ orderBy: { createdAt: 'desc' } }) as Promise<Project[]>
+  }
+
   async findByDirectorId(directorId: string): Promise<Project[]> {
     return prisma.project.findMany({ where: { directorId } }) as Promise<Project[]>
   }

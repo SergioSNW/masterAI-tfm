@@ -1,5 +1,6 @@
 node_modules/
 dist/
+api/router.mjs
 .env
 *.log
 test-results/

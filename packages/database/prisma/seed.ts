@@ -33,6 +33,100 @@ const actors = [
   { name: 'Bianca Rinaldi', email: 'bianca.rinaldi@example.com', phone: '+1 (555) 101-0028', bio: 'Italian cinema actress. Expresses powerfully through physicality.' },
 ]
 
+const demoDirector = {
+  id: 'd1',
+  email: 'director@masterai.demo',
+  name: 'Demo Director',
+  company: 'MasterAI Studio',
+}
+
+const demoActors = [
+  { id: 'a1', name: 'Emma Richardson', email: 'emma.r@example.com', bio: 'Strong emotional range. Leading lady for period drama.' },
+  { id: 'a2', name: 'James Whitfield', email: 'james.w@example.com', bio: 'Versatile character actor.' },
+  { id: 'a3', name: 'Sophia Chen', email: 'sophia.c@example.com', bio: 'Good diction. Classically trained.' },
+  { id: 'a4', name: 'Oliver Grant', email: 'oliver.g@example.com', bio: 'Young talent with fresh energy.' },
+  { id: 'a5', name: 'Diana Moss', email: 'diana.m@example.com', bio: 'Stage and screen actress.' },
+  { id: 'a6', name: 'Marcus Johnson', email: 'marcus.j@example.com', bio: 'Intense performance, very compelling.' },
+  { id: 'a7', name: 'Lena Fischer', email: 'lena.f@example.com', bio: 'Rising star with a sharp presence.' },
+]
+
+interface DemoCasting {
+  id: string
+  projectId: string
+  roleName: string
+  description?: string
+  requirements?: string
+  status: string
+}
+
+interface DemoRound {
+  id: string
+  castingId: string
+  name: string
+  description?: string
+  deadline?: Date
+  order: number
+  status: string
+}
+
+interface DemoSubmission {
+  id: string
+  roundId: string
+  actorId: string
+  videoUrl?: string
+  notes?: string
+  status: string
+  feedback?: string
+  createdAt: Date
+}
+
+const demoProjects = [
+  {
+    id: 'p1',
+    directorId: 'd1',
+    title: 'The Crown — Season 3',
+    description: 'Casting for new recurring characters and supporting roles for the upcoming season.',
+    status: 'active',
+  },
+  {
+    id: 'p2',
+    directorId: 'd1',
+    title: 'Breaking Bad — Season 2',
+    description: 'Casting for new lab assistants and cartel contacts.',
+    status: 'active',
+  },
+  {
+    id: 'p3',
+    directorId: 'd1',
+    title: 'Stranger Things — Season 5',
+    description: 'New characters for the final season. Multiple roles available.',
+    status: 'draft',
+  },
+]
+
+const demoCastings: DemoCasting[] = [
+  { id: 'c1', projectId: 'p1', roleName: 'Lead Role — Lady Victoria', description: 'A sophisticated aristocrat navigating post-war British high society.', requirements: 'British accent, age 30-45, period drama experience', status: 'open' },
+  { id: 'c2', projectId: 'p1', roleName: 'Supporting — Margaret', description: 'A sharp-tongued housekeeper with a hidden past.', requirements: 'Cockney accent a plus, age 40-60', status: 'open' },
+  { id: 'c3', projectId: 'p2', roleName: 'Recurring — Chemist', description: 'A brilliant but unstable organic chemist.', requirements: 'Must be comfortable with intense scenes', status: 'open' },
+]
+
+const demoRounds: DemoRound[] = [
+  { id: 'r1', castingId: 'c1', name: 'Self-Tape Submission', description: 'Submit a 2-minute monologue in character', deadline: new Date('2026-08-15T23:59:59Z'), order: 0, status: 'open' },
+  { id: 'r2', castingId: 'c1', name: 'Callback — In-Person', description: 'Live audition with the director', deadline: new Date('2026-09-01T23:59:59Z'), order: 1, status: 'pending' },
+  { id: 'r3', castingId: 'c2', name: 'Self-Tape Submission', description: 'Submit a 90-second scene', deadline: new Date('2026-08-20T23:59:59Z'), order: 0, status: 'open' },
+  { id: 'r4', castingId: 'c3', name: 'Video Submission', description: 'Submit a cold read of provided script', deadline: new Date('2026-08-10T23:59:59Z'), order: 0, status: 'open' },
+]
+
+const demoSubmissions: DemoSubmission[] = [
+  { id: 's1', roundId: 'r1', actorId: 'a1', videoUrl: '#', notes: 'Strong emotional range', status: 'shortlisted', feedback: 'Excellent presence. Moving to callbacks.', createdAt: new Date('2026-07-10T00:00:00Z') },
+  { id: 's2', roundId: 'r1', actorId: 'a2', videoUrl: '#', status: 'pending', createdAt: new Date('2026-07-11T00:00:00Z') },
+  { id: 's3', roundId: 'r1', actorId: 'a3', videoUrl: '#', notes: 'Good diction but needs more depth', status: 'reviewed', createdAt: new Date('2026-07-09T00:00:00Z') },
+  { id: 's4', roundId: 'r1', actorId: 'a4', videoUrl: '#', status: 'pending', createdAt: new Date('2026-07-12T00:00:00Z') },
+  { id: 's5', roundId: 'r3', actorId: 'a5', videoUrl: '#', status: 'pending', createdAt: new Date('2026-07-11T00:00:00Z') },
+  { id: 's6', roundId: 'r4', actorId: 'a6', videoUrl: '#', notes: 'Intense performance, very compelling', status: 'shortlisted', feedback: 'Great intensity. Moving to next round.', createdAt: new Date('2026-07-08T00:00:00Z') },
+  { id: 's7', roundId: 'r4', actorId: 'a7', videoUrl: '#', status: 'pending', createdAt: new Date('2026-07-12T00:00:00Z') },
+]
+
 async function main() {
   const seedActors = actors.map(a => ({
     ...a,
@@ -47,8 +141,58 @@ async function main() {
     })
   }
 
-  const count = await prisma.actor.count()
-  console.log(`Seeded ${count} actors`)
+  await prisma.director.upsert({
+    where: { id: demoDirector.id },
+    update: demoDirector,
+    create: demoDirector,
+  })
+
+  for (const actor of demoActors) {
+    await prisma.actor.upsert({
+      where: { id: actor.id },
+      update: actor,
+      create: actor,
+    })
+  }
+
+  for (const project of demoProjects) {
+    await prisma.project.upsert({
+      where: { id: project.id },
+      update: project,
+      create: project,
+    })
+  }
+
+  for (const casting of demoCastings) {
+    await prisma.casting.upsert({
+      where: { id: casting.id },
+      update: casting,
+      create: casting,
+    })
+  }
+
+  for (const round of demoRounds) {
+    await prisma.round.upsert({
+      where: { id: round.id },
+      update: round,
+      create: round,
+    })
+  }
+
+  for (const submission of demoSubmissions) {
+    await prisma.submission.upsert({
+      where: { id: submission.id },
+      update: submission,
+      create: submission,
+    })
+  }
+
+  const actorCount = await prisma.actor.count()
+  const projectCount = await prisma.project.count()
+  const castingCount = await prisma.casting.count()
+  const roundCount = await prisma.round.count()
+  const submissionCount = await prisma.submission.count()
+  console.log(`Seeded ${actorCount} actors, ${projectCount} projects, ${castingCount} castings, ${roundCount} rounds, ${submissionCount} submissions`)
 }
 
 main()

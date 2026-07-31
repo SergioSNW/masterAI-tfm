@@ -7,6 +7,7 @@ function mockRepos() {
   return {
     projectRepo: {
       findById: vi.fn(),
+      findAll: vi.fn(),
       findByDirectorId: vi.fn(),
       create: vi.fn().mockImplementation(async (p: Project) => p),
       update: vi.fn(),
