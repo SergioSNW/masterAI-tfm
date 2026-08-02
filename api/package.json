@@ -9,6 +9,7 @@
     "@masterai/core": "*",
     "@masterai/infrastructure": "*",
     "@vercel/blob": "^2.6.1",
+    "cloudinary": "^2.10.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {

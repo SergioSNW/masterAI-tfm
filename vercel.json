@@ -5,6 +5,10 @@
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
+      "source": "/api/cloudinary/(.*)",
+      "destination": "/api/cloudinary/$1"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/router"
     },
