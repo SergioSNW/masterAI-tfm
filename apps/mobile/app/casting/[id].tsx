@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, radii, spacing } from '../../src/theme/colors'
 import { GlassButton } from '../../src/components/GlassButton'
 import { GlassCard } from '../../src/components/GlassCard'
+import { CameraRecorder } from '../../src/components/CameraRecorder'
 import { fetchOpenCastings } from '../../src/services/castingService'
-import { submitVideo, readFileAsBase64 } from '../../src/services/submissionService'
+import { submitVideo, readVideoUriAsBase64 } from '../../src/services/submissionService'
 import { fetchComments } from '../../src/services/commentService'
 import type { CommentDTO } from '../../src/services/commentService'
 import { fetchAttachments, openAttachment } from '../../src/services/attachmentService'
@@ -31,6 +32,7 @@ export default function CastingDetail() {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentDTO[]>([])
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
 
   useEffect(() => {
     fetchOpenCastings().then(all => {
@@ -60,27 +62,14 @@ export default function CastingDetail() {
     }
   }, [localSubmission, casting?.submission])
 
-  async function handleFilePick() {
-    if (Platform.OS === 'web' && typeof document !== 'undefined') {
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = 'video/mp4,video/quicktime,video/webm'
-      input.onchange = async (e: Event) => {
-        const file = (e.target as HTMLInputElement).files?.[0]
-        if (!file || !casting) return
-        await doUpload(file)
-      }
-      input.click()
-    }
-  }
-
-  async function doUpload(file: File) {
+  async function handleRecorded(uri: string) {
     if (!casting) return
+    setShowCamera(false)
     setUploading(true)
     setUploadError(null)
     try {
-      const videoData = await readFileAsBase64(file)
-      const result = await submitVideo(casting, videoData, file.name)
+      const videoData = await readVideoUriAsBase64(uri)
+      const result = await submitVideo(casting, videoData, 'audition-recording.mp4')
       setLocalSubmission({ status: result.status, feedback: result.feedback, submittedAt: result.submittedAt })
     } catch {
       setUploadError('Upload failed. Check your connection and try again.')
@@ -105,6 +94,15 @@ export default function CastingDetail() {
           <GlassButton title="Go Back" onPress={() => router.back()} variant="ghost" />
         </View>
       </SafeAreaView>
+    )
+  }
+
+  if (showCamera && casting) {
+    return (
+      <CameraRecorder
+        onRecorded={handleRecorded}
+        onCancel={() => setShowCamera(false)}
+      />
     )
   }
 
@@ -186,8 +184,8 @@ export default function CastingDetail() {
             )}
             {submission.status === 'pending' && casting.status === 'open' && (
               <GlassButton
-                title={uploading ? 'Uploading...' : 'Re-submit Video'}
-                onPress={handleFilePick}
+                title={uploading ? 'Uploading...' : 'Re-record Video'}
+                onPress={() => setShowCamera(true)}
                 variant="primary"
                 disabled={uploading}
                 style={{ marginTop: spacing.md }}
@@ -203,8 +201,8 @@ export default function CastingDetail() {
             <Text style={styles.subtitle}>You haven't submitted for this role yet.</Text>
             {casting.status === 'open' && (
               <GlassButton
-                title={uploading ? 'Uploading...' : 'Submit Video'}
-                onPress={handleFilePick}
+                title={uploading ? 'Uploading...' : 'Record Video'}
+                onPress={() => setShowCamera(true)}
                 variant="primary"
                 disabled={uploading}
                 style={{ marginTop: spacing.md }}
