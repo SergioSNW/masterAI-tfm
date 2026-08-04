@@ -28,3 +28,7 @@ export const ReviewSubmissionSchema = z.object({
   status: z.enum(['reviewed', 'shortlisted', 'rejected']),
   feedback: z.string().max(2000).optional(),
 })
+
+export const AnalyzeSubmissionSchema = z.object({
+  submissionId: z.string().min(1, 'Submission ID is required'),
+})

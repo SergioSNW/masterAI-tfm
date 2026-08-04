@@ -36,6 +36,8 @@ export { ManualUploadUseCase } from './submissions/ManualUploadUseCase.js'
 export type { ManualUploadDTO } from './submissions/ManualUploadUseCase.js'
 export { CreateSubmissionUseCase } from './submissions/CreateSubmissionUseCase.js'
 export type { CreateSubmissionDTO } from './submissions/CreateSubmissionUseCase.js'
+export { GenerateAIAnalysisUseCase } from './submissions/GenerateAIAnalysisUseCase.js'
+export type { GenerateAIAnalysisDTO } from './submissions/GenerateAIAnalysisUseCase.js'
 export { ReviewSubmissionUseCase } from './submissions/ReviewSubmissionUseCase.js'
 export type { ReviewSubmissionDTO } from './submissions/ReviewSubmissionUseCase.js'
 

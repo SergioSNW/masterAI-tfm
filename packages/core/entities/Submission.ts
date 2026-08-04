@@ -9,6 +9,9 @@ export interface Submission {
   notes?: string
   status: SubmissionStatus
   feedback?: string
+  transcript?: string
+  aiScore?: number
+  aiFeedback?: string
   createdAt: Date
   updatedAt: Date
 }

@@ -36,3 +36,22 @@ export async function fetchSubmissions(roundId: string): Promise<SubmissionDTO[]
 export async function reviewSubmission(input: ReviewInput): Promise<void> {
   await post('/submissions/review', input)
 }
+
+export interface AnalyzeInput {
+  submissionId: string
+}
+
+export interface AnalyzeResult {
+  transcript?: string
+  aiScore?: number
+  aiFeedback?: string
+}
+
+export async function analyzeSubmission(input: AnalyzeInput): Promise<AnalyzeResult> {
+  const res = await post<{ transcript?: string; aiScore?: number; aiFeedback?: string }>('/analyze', input)
+  return {
+    transcript: res.transcript,
+    aiScore: res.aiScore,
+    aiFeedback: res.aiFeedback,
+  }
+}

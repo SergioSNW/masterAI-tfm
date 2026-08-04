@@ -41,6 +41,9 @@ interface DashboardSubmissionDTO {
   notes?: string
   status: string
   feedback?: string
+  transcript?: string
+  aiScore?: number
+  aiFeedback?: string
   createdAt: string
 }
 
@@ -107,6 +110,9 @@ export async function fetchDashboard(): Promise<Project[]> {
           notes: s.notes,
           status: s.status as Submission['status'],
           feedback: s.feedback,
+          transcript: s.transcript,
+          aiScore: s.aiScore,
+          aiFeedback: s.aiFeedback,
           createdAt: s.createdAt,
         })),
       })),

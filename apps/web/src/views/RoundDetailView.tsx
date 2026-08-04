@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Round, Submission } from '../data/mock'
 import { UploadVideoModal } from '../components/UploadVideoModal'
 import { DocumentUploadZone } from '../components/DocumentUploadZone'
-import { reviewSubmission } from '../services/submissionService'
+import { reviewSubmission, analyzeSubmission } from '../services/submissionService'
 import { fetchComments, createComment } from '../services/commentService'
 import type { CommentDTO } from '../services/commentService'
 import { fetchAttachments, addAttachment, removeAttachment } from '../services/attachmentService'
@@ -27,6 +27,7 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
   const [attachments, setAttachments] = useState<AttachmentDTO[]>([])
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null)
 
   useEffect(() => {
     setAttachmentsLoading(true)
@@ -99,6 +100,27 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
 
     reviewSubmission({ submissionId, status, feedback: feedback || undefined }).catch(() => {})
     onReview?.(submissionId, status, feedback || undefined)
+  }
+
+  async function handleAnalyze(sub: Submission) {
+    setAnalyzingId(sub.id)
+    try {
+      const result = await analyzeSubmission({ submissionId: sub.id })
+      const updated: Submission = {
+        ...sub,
+        transcript: result.transcript,
+        aiScore: result.aiScore,
+        aiFeedback: result.aiFeedback,
+      }
+      setSubmissions(prev => prev.map(s => s.id === sub.id ? updated : s))
+      setSelected(updated)
+      toast.success('AI analysis complete')
+    } catch (err) {
+      const message = (err as { error?: string })?.error ?? 'AI analysis failed'
+      toast.error(typeof message === 'string' ? message : 'AI analysis failed')
+    } finally {
+      setAnalyzingId(null)
+    }
   }
 
   const statusCounts = {
@@ -206,6 +228,47 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
             ) : (
               <div className="video-placeholder">🎬</div>
             )}
+
+            <div className="ai-panel" style={{
+              background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+              borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 16,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <strong style={{ fontSize: 14 }}>AI Analysis</strong>
+                {selected.transcript && selected.aiScore != null && (
+                  <span className="badge badge-active">{selected.aiScore}/100</span>
+                )}
+              </div>
+
+              {analyzingId === selected.id ? (
+                <div style={{ fontSize: 13, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span className="spinner" /> Analyzing submission audio... (10–15s)
+                </div>
+              ) : selected.transcript && selected.aiScore != null ? (
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                  {selected.aiFeedback && (
+                    <p style={{ margin: '0 0 12px', lineHeight: 1.5 }}>{selected.aiFeedback}</p>
+                  )}
+                  <details style={{ margin: 0 }}>
+                    <summary style={{ cursor: 'pointer', color: 'var(--accent-1)', marginBottom: 6 }}>
+                      View transcript
+                    </summary>
+                    <p style={{ margin: 0, fontStyle: 'italic', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                      {selected.transcript}
+                    </p>
+                  </details>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: 13, color: 'var(--text-tertiary)', margin: '0 0 12px' }}>
+                    Run AI transcription and scoring for this submission.
+                  </p>
+                  <button className="btn btn-ghost" style={{ fontSize: 13 }} onClick={() => handleAnalyze(selected)}>
+                    Generate AI Analysis
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="detail-row"><strong>Email</strong><span>{selected.actorEmail}</span></div>
             <div className="detail-row"><strong>Status</strong><span className={`badge badge-${selected.status === 'reviewed' ? 'active' : selected.status}`}>{selected.status}</span></div>

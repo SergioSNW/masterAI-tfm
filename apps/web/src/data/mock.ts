@@ -16,6 +16,9 @@ export interface Submission {
   notes?: string
   status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected'
   feedback?: string
+  transcript?: string
+  aiScore?: number
+  aiFeedback?: string
   createdAt: string
 }
 

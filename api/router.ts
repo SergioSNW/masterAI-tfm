@@ -19,6 +19,7 @@ import {
   CreateCommentSchema,
   ListCommentsSchema,
   CreateSubmissionSchema,
+  AnalyzeSubmissionSchema,
   prisma,
   PrismaActorRepository,
   PrismaCastingRepository,
@@ -51,7 +52,10 @@ import {
   CreateSubmissionUseCase,
   CreateCommentUseCase,
   ListCommentsUseCase,
+  GenerateAIAnalysisUseCase,
+  AIServiceError,
 } from '@masterai/core'
+import { OpenAIAnalysisService } from './ai/OpenAIAnalysisService.js'
 
 /* ── Blob upload config ── */
 
@@ -120,6 +124,7 @@ const routes: Route[] = [
   defineRoute('POST', '/api/submissions/review', reviewSubmission),
   defineRoute('POST', '/api/submissions/comment', createComment),
   defineRoute('GET', '/api/submissions/comments', listComments),
+  defineRoute('POST', '/api/analyze', analyzeSubmission),
 ]
 
 /* ── Main entry ── */
@@ -245,6 +250,9 @@ async function dashboard(req: VercelRequest, res: VercelResponse) {
           notes: s.notes ?? undefined,
           status: s.status,
           feedback: s.feedback ?? undefined,
+          transcript: s.transcript ?? undefined,
+          aiScore: s.aiScore ?? undefined,
+          aiFeedback: s.aiFeedback ?? undefined,
           createdAt: s.createdAt.toISOString(),
         })),
       })),
@@ -407,6 +415,29 @@ async function reviewSubmission(req: VercelRequest, res: VercelResponse) {
   const useCase = new ReviewSubmissionUseCase(new PrismaSubmissionRepository())
   const result = await useCase.execute(parsed.data)
   if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(200).json(result.data)
+}
+
+async function analyzeSubmission(req: VercelRequest, res: VercelResponse) {
+  const parsed = AnalyzeSubmissionSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new GenerateAIAnalysisUseCase(
+    new PrismaSubmissionRepository(),
+    new PrismaRoundRepository(),
+    new PrismaCastingRepository(),
+    new OpenAIAnalysisService(),
+  )
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) {
+    const err = result.error
+    if (err instanceof AIServiceError) {
+      return res.status(err.statusCode).json({ error: err.message })
+    }
+    if (err.message === 'Submission not found' || err.message === 'Submission has no video to analyze') {
+      return res.status(404).json({ error: err.message })
+    }
+    return res.status(400).json({ error: err.message })
+  }
   return res.status(200).json(result.data)
 }
 
