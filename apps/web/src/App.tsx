@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { getProfile } from './services/profileService'
@@ -10,8 +11,7 @@ import { HelpView } from './views/HelpView'
 import { ProjectDetailView } from './views/ProjectDetailView'
 import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
-import { createProject } from './services/projectService'
-import { mockProjects } from './data/mock'
+import { createProject, fetchDashboard } from './services/projectService'
 import type { CreateProjectInput } from './services/projectService'
 import type { Project, Casting, Round } from './data/mock'
 
@@ -126,6 +126,17 @@ export default function App() {
   const navigate = useNavigate()
   const path = useActiveRoute()
   const profile = getProfile()
+  const [projects, setProjects] = useState<Project[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchDashboard()
+      .then(setProjects)
+      .catch((err: unknown) => {
+        setLoadError(err instanceof Error ? err.message : 'Failed to load dashboard')
+        setProjects([])
+      })
+  }, [])
 
   const isActive = (match: string[]) => match.some(m => path === m || path.startsWith(m + '/') || (m === '/' && path === '/projects'))
 
@@ -172,18 +183,25 @@ export default function App() {
           </div>
         </header>
         <div className="content">
-          <ProjectProvider initial={mockProjects}>
-            <Routes>
-              <Route path="/project/:id" element={<ProjectDetailRoute />} />
-              <Route path="/casting/:id" element={<CastingDetailRoute />} />
-              <Route path="/round/:id" element={<RoundDetailRoute />} />
-              <Route path="/actors" element={<ActorsView />} />
-              <Route path="/docs" element={<DocsView />} />
-              <Route path="/help" element={<HelpView />} />
-              <Route path="/settings" element={<SettingsView />} />
-              <Route path="*" element={<ProjectsRoute />} />
-            </Routes>
-          </ProjectProvider>
+          {projects ? (
+            <ProjectProvider initial={projects}>
+              <Routes>
+                <Route path="/project/:id" element={<ProjectDetailRoute />} />
+                <Route path="/casting/:id" element={<CastingDetailRoute />} />
+                <Route path="/round/:id" element={<RoundDetailRoute />} />
+                <Route path="/actors" element={<ActorsView />} />
+                <Route path="/docs" element={<DocsView />} />
+                <Route path="/help" element={<HelpView />} />
+                <Route path="/settings" element={<SettingsView />} />
+                <Route path="*" element={<ProjectsRoute />} />
+              </Routes>
+            </ProjectProvider>
+          ) : (
+            <div className="empty-state" style={{ padding: '80px 20px' }}>
+              <h3>{loadError ? 'Failed to load dashboard' : 'Loading dashboard...'}</h3>
+              {loadError && <p>{loadError}</p>}
+            </div>
+          )}
         </div>
       </main>
     </div>

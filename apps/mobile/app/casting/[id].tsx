@@ -7,7 +7,8 @@ import { GlassButton } from '../../src/components/GlassButton'
 import { GlassCard } from '../../src/components/GlassCard'
 import { CameraRecorder } from '../../src/components/CameraRecorder'
 import { fetchOpenCastings } from '../../src/services/castingService'
-import { submitVideo, readVideoUriAsBase64 } from '../../src/services/submissionService'
+import { submitCloudinaryVideo } from '../../src/services/submissionService'
+import { uploadVideoToCloudinary } from '../../src/services/uploadService'
 import { fetchComments } from '../../src/services/commentService'
 import type { CommentDTO } from '../../src/services/commentService'
 import { fetchAttachments, openAttachment } from '../../src/services/attachmentService'
@@ -68,8 +69,8 @@ export default function CastingDetail() {
     setUploading(true)
     setUploadError(null)
     try {
-      const videoData = await readVideoUriAsBase64(uri)
-      const result = await submitVideo(casting, videoData, 'audition-recording.mp4')
+      const videoUrl = await uploadVideoToCloudinary(uri)
+      const result = await submitCloudinaryVideo(casting, videoUrl)
       setLocalSubmission({ status: result.status, feedback: result.feedback, submittedAt: result.submittedAt })
     } catch {
       setUploadError('Upload failed. Check your connection and try again.')

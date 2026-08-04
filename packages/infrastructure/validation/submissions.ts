@@ -8,6 +8,13 @@ export const SubmitVideoSchema = z.object({
   notes: z.string().max(2000).optional(),
 })
 
+export const CreateSubmissionSchema = z.object({
+  castingId: z.string().min(1),
+  actorId: z.string().min(1),
+  videoUrl: z.string().url().min(1, 'Video URL is required'),
+  notes: z.string().max(2000).optional(),
+})
+
 export const ManualUploadSchema = z.object({
   roundId: z.string().uuid(),
   actorId: z.string().uuid(),

@@ -1,48 +1,44 @@
+import { get } from './api'
 import type { CastingDTO } from './types'
 
-const MOCK_CASTINGS: CastingDTO[] = [
-  {
-    id: '1',
-    title: 'Lead Role — Feature Film',
-    projectName: 'Eclipse',
-    role: 'Lead Actor',
-    deadline: 'Aug 15, 2026',
-    status: 'open',
-    roundId: 'r1',
-    submission: {
-      status: 'shortlisted',
-      feedback: 'Excellent presence and emotional range. Moving to callbacks.',
-      submittedAt: 'Jul 10, 2026',
-    },
-  },
-  {
-    id: '2',
-    title: 'Supporting Role — TV Series',
-    projectName: 'Nightfall',
-    role: 'Supporting Actor',
-    deadline: 'Aug 30, 2026',
-    status: 'open',
-    roundId: 'r2',
-    submission: {
-      status: 'pending',
-      submittedAt: 'Jul 14, 2026',
-    },
-  },
-  {
-    id: '3',
-    title: 'Voice Over — Animation',
-    projectName: 'Starlight',
-    role: 'Voice Actor',
-    deadline: 'Sep 1, 2026',
-    status: 'open',
-    roundId: 'r3',
-  },
-]
+const ACTOR_ID = process.env.EXPO_PUBLIC_ACTOR_ID ?? 'a1'
+
+interface RawCastingDTO {
+  id: string
+  title: string
+  projectName: string
+  role: string
+  deadline?: string
+  status: string
+  roundId?: string
+  submission?: {
+    status: string
+    feedback?: string
+    submittedAt?: string
+  }
+}
+
+function formatDate(iso?: string): string {
+  if (!iso) return 'TBD'
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 export async function fetchOpenCastings(): Promise<CastingDTO[]> {
-  // When API endpoints exist, replace with:
-  // return get<CastingDTO[]>('/castings?status=open')
-  return new Promise(resolve => {
-    setTimeout(() => resolve([...MOCK_CASTINGS]), 600)
-  })
+  const items = await get<RawCastingDTO[]>(`/castings?actorId=${encodeURIComponent(ACTOR_ID)}`)
+  return items.map(item => ({
+    id: item.id,
+    title: item.title,
+    projectName: item.projectName,
+    role: item.role,
+    deadline: formatDate(item.deadline),
+    status: item.status,
+    roundId: item.roundId,
+    submission: item.submission
+      ? {
+          status: item.submission.status as 'pending' | 'reviewed' | 'shortlisted' | 'rejected',
+          feedback: item.submission.feedback,
+          submittedAt: formatDate(item.submission.submittedAt),
+        }
+      : undefined,
+  }))
 }

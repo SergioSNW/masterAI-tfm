@@ -199,7 +199,7 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
               <button className="modal-close" onClick={() => setSelected(null)}>×</button>
             </div>
 
-            {selected.videoUrl.startsWith('data:') ? (
+            {/^(https?|data):/.test(selected.videoUrl) ? (
               <video controls style={{ width: '100%', borderRadius: 'var(--radius-md)', marginBottom: 16, maxHeight: 360 }} src={selected.videoUrl}>
                 Your browser does not support the video tag.
               </video>

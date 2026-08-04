@@ -34,6 +34,8 @@ export { SubmitVideoUseCase } from './submissions/SubmitVideoUseCase.js'
 export type { SubmitVideoDTO } from './submissions/SubmitVideoUseCase.js'
 export { ManualUploadUseCase } from './submissions/ManualUploadUseCase.js'
 export type { ManualUploadDTO } from './submissions/ManualUploadUseCase.js'
+export { CreateSubmissionUseCase } from './submissions/CreateSubmissionUseCase.js'
+export type { CreateSubmissionDTO } from './submissions/CreateSubmissionUseCase.js'
 export { ReviewSubmissionUseCase } from './submissions/ReviewSubmissionUseCase.js'
 export type { ReviewSubmissionDTO } from './submissions/ReviewSubmissionUseCase.js'
 

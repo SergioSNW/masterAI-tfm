@@ -1,4 +1,7 @@
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || ''
+const API_BASE =
+  process.env.EXPO_PUBLIC_API_URL
+    ? process.env.EXPO_PUBLIC_API_URL
+    : 'https://master-ai-tfm.vercel.app'
 
 export class ApiError extends Error {
   constructor(

@@ -18,6 +18,8 @@ import {
   ReviewSubmissionSchema,
   CreateCommentSchema,
   ListCommentsSchema,
+  CreateSubmissionSchema,
+  prisma,
   PrismaActorRepository,
   PrismaCastingRepository,
   PrismaProjectRepository,
@@ -46,6 +48,7 @@ import {
   ListAttachmentsUseCase,
   ManualUploadUseCase,
   ReviewSubmissionUseCase,
+  CreateSubmissionUseCase,
   CreateCommentUseCase,
   ListCommentsUseCase,
 } from '@masterai/core'
@@ -98,7 +101,9 @@ const routes: Route[] = [
   defineRoute('POST', '/api/projects/create', createProject),
   defineRoute('POST', '/api/projects/close', closeProject),
   defineRoute('PUT', '/api/projects/:id/status', updateProjectStatus),
+  defineRoute('GET', '/api/dashboard', dashboard),
 
+  defineRoute('GET', '/api/castings', listCastings),
   defineRoute('POST', '/api/castings/create', createCasting),
   defineRoute('POST', '/api/castings/close', closeCasting),
   defineRoute('PUT', '/api/castings/:id/phase', updateCastingPhase),
@@ -110,6 +115,7 @@ const routes: Route[] = [
   defineRoute('GET', '/api/rounds/attachments', listAttachments),
   defineRoute('DELETE', '/api/rounds/attachment/:id', removeAttachment),
 
+  defineRoute('POST', '/api/submissions', createSubmission),
   defineRoute('POST', '/api/submissions/upload', uploadSubmission),
   defineRoute('POST', '/api/submissions/review', reviewSubmission),
   defineRoute('POST', '/api/submissions/comment', createComment),
@@ -185,6 +191,106 @@ async function listProjects(req: VercelRequest, res: VercelResponse) {
   const result = await useCase.execute()
   if (!result.ok) return res.status(500).json({ error: result.error.message })
   return res.status(200).json(result.data)
+}
+
+async function dashboard(req: VercelRequest, res: VercelResponse) {
+  const projects = await prisma.project.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      castings: {
+        orderBy: { createdAt: 'asc' },
+        include: {
+          rounds: {
+            orderBy: { order: 'asc' },
+            include: {
+              submissions: {
+                orderBy: { createdAt: 'desc' },
+                include: { actor: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  const tree = projects.map(p => ({
+    id: p.id,
+    title: p.title,
+    description: p.description ?? undefined,
+    status: p.status,
+    castings: p.castings.map(c => ({
+      id: c.id,
+      projectId: c.projectId,
+      roleName: c.roleName,
+      description: c.description ?? undefined,
+      requirements: c.requirements ?? undefined,
+      status: c.status,
+      activePhase: c.activePhase,
+      rounds: c.rounds.map(r => ({
+        id: r.id,
+        castingId: r.castingId,
+        name: r.name,
+        description: r.description ?? undefined,
+        deadline: r.deadline ? r.deadline.toISOString() : undefined,
+        order: r.order,
+        status: r.status,
+        submissions: r.submissions.map(s => ({
+          id: s.id,
+          actorId: s.actorId,
+          actorName: s.actor.name,
+          actorEmail: s.actor.email,
+          videoUrl: s.videoUrl ?? '',
+          thumbnailUrl: s.thumbnailUrl ?? undefined,
+          notes: s.notes ?? undefined,
+          status: s.status,
+          feedback: s.feedback ?? undefined,
+          createdAt: s.createdAt.toISOString(),
+        })),
+      })),
+    })),
+  }))
+
+  return res.status(200).json(tree)
+}
+
+async function listCastings(req: VercelRequest, res: VercelResponse) {
+  const actorId = req.query.actorId as string | undefined
+
+  const castings = await prisma.casting.findMany({
+    where: { status: 'open' },
+    orderBy: { createdAt: 'asc' },
+    include: {
+      project: true,
+      rounds: {
+        orderBy: { order: 'asc' },
+        include: { submissions: { orderBy: { createdAt: 'desc' } } },
+      },
+    },
+  })
+
+  const items = castings.map(c => {
+    const round = c.rounds.find(r => r.status === 'open') ?? c.rounds[0]
+    const submission = actorId && round ? round.submissions.find(s => s.actorId === actorId) : undefined
+    return {
+      id: c.id,
+      title: c.roleName,
+      projectName: c.project.title,
+      role: c.roleName,
+      deadline: round?.deadline ? round.deadline.toISOString() : undefined,
+      status: c.status,
+      roundId: round?.id,
+      submission: submission
+        ? {
+            status: submission.status,
+            feedback: submission.feedback ?? undefined,
+            submittedAt: submission.createdAt.toISOString(),
+          }
+        : undefined,
+    }
+  })
+
+  return res.status(200).json(items)
 }
 
 async function createProject(req: VercelRequest, res: VercelResponse) {
@@ -270,6 +376,20 @@ async function listAttachments(req: VercelRequest, res: VercelResponse) {
 
 async function removeAttachment(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
   return res.status(200).json({ id: params.id, removed: true })
+}
+
+async function createSubmission(req: VercelRequest, res: VercelResponse) {
+  const parsed = CreateSubmissionSchema.safeParse(req.body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+  const useCase = new CreateSubmissionUseCase(
+    new PrismaSubmissionRepository(),
+    new PrismaRoundRepository(),
+    new PrismaCastingRepository(),
+    new PrismaActorRepository(),
+  )
+  const result = await useCase.execute(parsed.data)
+  if (!result.ok) return res.status(400).json({ error: result.error.message })
+  return res.status(201).json(result.data)
 }
 
 async function uploadSubmission(req: VercelRequest, res: VercelResponse) {
