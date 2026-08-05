@@ -8,6 +8,8 @@ interface RawCastingDTO {
   title: string
   projectName: string
   role: string
+  description?: string
+  requirements?: string
   deadline?: string
   status: string
   roundId?: string
@@ -30,6 +32,8 @@ export async function fetchOpenCastings(): Promise<CastingDTO[]> {
     title: item.title,
     projectName: item.projectName,
     role: item.role,
+    description: item.description,
+    requirements: item.requirements,
     deadline: formatDate(item.deadline),
     status: item.status,
     roundId: item.roundId,

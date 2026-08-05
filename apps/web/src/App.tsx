@@ -11,6 +11,8 @@ import { HelpView } from './views/HelpView'
 import { ProjectDetailView } from './views/ProjectDetailView'
 import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
+import { PersonaSelector } from './views/PersonaSelector'
+import { ActorPortalView } from './views/ActorPortalView'
 import { createProject, fetchDashboard } from './services/projectService'
 import type { CreateProjectInput } from './services/projectService'
 import type { Project, Casting, Round } from './data/mock'
@@ -47,7 +49,7 @@ function ProjectDetailRoute() {
   const { projects, addCasting } = useProjectContext()
 
   const project = projects.find(p => p.id === id)
-  if (!project) return <Navigate to="/" />
+  if (!project) return <Navigate to="/projects" />
 
   return (
     <ProjectDetailView
@@ -71,7 +73,7 @@ function CastingDetailRoute() {
     if (c) { casting = c; parentProjectId = p.id; break }
   }
 
-  if (!casting) return <Navigate to="/" />
+  if (!casting) return <Navigate to="/projects" />
 
   return (
     <CastingDetailView
@@ -98,7 +100,7 @@ function RoundDetailRoute() {
     if (round) break
   }
 
-  if (!round) return <Navigate to="/" />
+  if (!round) return <Navigate to="/projects" />
 
   return (
     <RoundDetailView
@@ -111,7 +113,7 @@ function RoundDetailRoute() {
 /* ── Nav config ── */
 
 const navItems = [
-  { path: '/', label: 'Projects', icon: '🎬', match: ['/', '/projects', '/project', '/casting', '/round'] },
+  { path: '/projects', label: 'Projects', icon: '🎬', match: ['/', '/projects', '/project', '/casting', '/round'] },
   { path: '/actors', label: 'Actors', icon: '👥', match: ['/actors'] },
   { path: '/docs', label: 'Docs', icon: '📖', match: ['/docs'] },
   { path: '/help', label: 'Help', icon: '❓', match: ['/help'] },
@@ -126,6 +128,8 @@ export default function App() {
   const navigate = useNavigate()
   const path = useActiveRoute()
   const profile = getProfile()
+  const isSelector = path === '/'
+  const isActor = path.startsWith('/actor')
   const [projects, setProjects] = useState<Project[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -161,49 +165,85 @@ export default function App() {
         <div className="orb orb-3" />
       </div>
 
-      <aside className="sidebar glass">
-        <div className="logo">MasterAI</div>
-        {navItems.map(item => (
-          <button
-            key={item.path}
-            className={`nav-item${isActive(item.match) ? ' active' : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            <span>{item.icon}</span> {item.label}
-          </button>
-        ))}
-      </aside>
-
-      <main className="main-area">
-        <header className="topbar glass">
-          <h1 className="topbar-title">Director Dashboard</h1>
-          <div className="topbar-right">
-            <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{profile.name}</span>
-            <div className="avatar">{profile.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
-          </div>
-        </header>
-        <div className="content">
-          {projects ? (
-            <ProjectProvider initial={projects}>
+      {isSelector ? (
+        <PersonaSelector
+          onDirector={() => navigate('/projects')}
+          onActor={() => navigate('/actor')}
+        />
+      ) : isActor ? (
+        <>
+          <aside className="sidebar glass">
+            <div className="logo">MasterAI</div>
+            <div style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-tertiary)' }}>🎭 Actor</div>
+          </aside>
+          <main className="main-area">
+            <header className="topbar glass">
+              <h1 className="topbar-title">Actor Portal</h1>
+              <div className="topbar-right">
+                <button className="btn btn-ghost switch-role-btn" onClick={() => navigate('/')}>
+                  Switch Role
+                </button>
+              </div>
+            </header>
+            <div className="content">
               <Routes>
-                <Route path="/project/:id" element={<ProjectDetailRoute />} />
-                <Route path="/casting/:id" element={<CastingDetailRoute />} />
-                <Route path="/round/:id" element={<RoundDetailRoute />} />
-                <Route path="/actors" element={<ActorsView />} />
-                <Route path="/docs" element={<DocsView />} />
-                <Route path="/help" element={<HelpView />} />
-                <Route path="/settings" element={<SettingsView />} />
-                <Route path="*" element={<ProjectsRoute />} />
+                <Route path="/actor" element={<ActorPortalView />} />
+                <Route path="*" element={<Navigate to="/" />} />
               </Routes>
-            </ProjectProvider>
-          ) : (
-            <div className="empty-state" style={{ padding: '80px 20px' }}>
-              <h3>{loadError ? 'Failed to load dashboard' : 'Loading dashboard...'}</h3>
-              {loadError && <p>{loadError}</p>}
             </div>
-          )}
-        </div>
-      </main>
+          </main>
+        </>
+      ) : (
+        <>
+          <aside className="sidebar glass">
+            <div className="logo">MasterAI</div>
+            {navItems.map(item => (
+              <button
+                key={item.path}
+                className={`nav-item${isActive(item.match) ? ' active' : ''}`}
+                onClick={() => navigate(item.path)}
+              >
+                <span>{item.icon}</span> {item.label}
+              </button>
+            ))}
+          </aside>
+
+          <main className="main-area">
+            <header className="topbar glass">
+              <h1 className="topbar-title">Director Dashboard</h1>
+              <div className="topbar-right">
+                <button className="btn btn-ghost switch-role-btn" onClick={() => navigate('/')}>
+                  Switch Role
+                </button>
+                <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{profile.name}</span>
+                <div className="avatar">{profile.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
+              </div>
+            </header>
+            <div className="content">
+              {projects ? (
+                <ProjectProvider initial={projects}>
+                  <Routes>
+                    <Route path="/projects" element={<ProjectsRoute />} />
+                    <Route path="/project/:id" element={<ProjectDetailRoute />} />
+                    <Route path="/casting/:id" element={<CastingDetailRoute />} />
+                    <Route path="/round/:id" element={<RoundDetailRoute />} />
+                    <Route path="/actors" element={<ActorsView />} />
+                    <Route path="/docs" element={<DocsView />} />
+                    <Route path="/help" element={<HelpView />} />
+                    <Route path="/settings" element={<SettingsView />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                  </Routes>
+                </ProjectProvider>
+              ) : (
+                <div className="empty-state" style={{ padding: '80px 20px' }}>
+                  <h3>{loadError ? 'Failed to load dashboard' : 'Loading dashboard...'}</h3>
+                  {loadError && <p>{loadError}</p>}
+                </div>
+              )}
+            </div>
+          </main>
+        </>
+      )}
     </div>
   )
 }

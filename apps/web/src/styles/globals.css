@@ -1082,3 +1082,85 @@ select.edit-input option {
 .content > div > .detail-header {
   margin-bottom: 8px;
 }
+
+/* ── Persona selector ── */
+.persona-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  text-align: center;
+}
+
+.persona-logo {
+  font-size: 28px;
+  padding: 0 0 12px;
+}
+
+.persona-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.persona-sub {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  margin-bottom: 28px;
+}
+
+.persona-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 760px;
+}
+
+.persona-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 300px;
+  padding: 36px 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.persona-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glass);
+}
+
+.persona-icon {
+  font-size: 40px;
+}
+
+.persona-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.persona-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ── Switch Role button ── */
+.switch-role-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

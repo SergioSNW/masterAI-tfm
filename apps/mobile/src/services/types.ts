@@ -3,6 +3,8 @@ export interface CastingDTO {
   title: string
   projectName: string
   role: string
+  description?: string
+  requirements?: string
   deadline: string
   status: string
   roundId?: string

@@ -285,6 +285,8 @@ async function listCastings(req: VercelRequest, res: VercelResponse) {
       title: c.roleName,
       projectName: c.project.title,
       role: c.roleName,
+      description: c.description ?? undefined,
+      requirements: c.requirements ?? undefined,
       deadline: round?.deadline ? round.deadline.toISOString() : undefined,
       status: c.status,
       roundId: round?.id,

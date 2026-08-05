@@ -129,6 +129,18 @@ export default function CastingDetail() {
             <Text style={styles.metaLabel}>Deadline</Text>
             <Text style={styles.metaValue}>{casting.deadline}</Text>
           </View>
+          {casting.description ? (
+            <View style={{ marginTop: spacing.md }}>
+              <Text style={styles.metaLabel}>Description</Text>
+              <Text style={styles.bodyText}>{casting.description}</Text>
+            </View>
+          ) : null}
+          {casting.requirements ? (
+            <View style={{ marginTop: spacing.md }}>
+              <Text style={styles.metaLabel}>Requirements</Text>
+              <Text style={styles.bodyText}>{casting.requirements}</Text>
+            </View>
+          ) : null}
         </GlassCard>
 
         {attachments.length > 0 && (
@@ -268,6 +280,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: colors.text.tertiary,
+    marginTop: spacing.xs,
+  },
+  bodyText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    lineHeight: 20,
     marginTop: spacing.xs,
   },
   badge: {

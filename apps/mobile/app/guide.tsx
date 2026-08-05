@@ -21,7 +21,7 @@ const SECTIONS: Array<{ title: string; items: FaqItem[] }> = [
   {
     title: 'Submissions',
     items: [
-      { q: 'How do I submit an audition?', a: 'Tap a casting card to open the detail screen. If you haven\'t submitted yet, you\'ll see a "Not Submitted" message. A future update will add the video upload feature — for now, directors can upload on your behalf.' },
+      { q: 'How do I submit an audition?', a: 'Tap a casting card to open the detail screen. If you haven\'t submitted yet, tap "Record Video" to capture your audition from within the app. Your recording is uploaded automatically and enters "Pending Review" status.' },
       { q: 'What happens after I submit?', a: 'Your submission enters "Pending Review" status. The director will watch your video and either shortlist you, mark it as reviewed, or reject it. You\'ll see the status update here in the app.' },
     ],
   },
