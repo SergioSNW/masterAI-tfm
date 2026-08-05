@@ -1085,7 +1085,8 @@ select.edit-input option {
 
 /* ── Persona selector ── */
 .persona-shell {
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1093,6 +1094,7 @@ select.edit-input option {
   gap: 8px;
   padding: 32px;
   text-align: center;
+  overflow-y: auto;
 }
 
 .persona-logo {
