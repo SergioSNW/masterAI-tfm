@@ -5,17 +5,17 @@ interface Props {
   project: Project
   onBack: () => void
   onCastingClick: (id: string) => void
-  onCastingCreate: (projectId: string, casting: Casting) => void
+  onCastingCreate: (projectId: string, casting: Casting) => Promise<void>
 }
 
 export function ProjectDetailView({ project, onBack, onCastingClick, onCastingCreate }: Props) {
   const [showForm, setShowForm] = useState(false)
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = new FormData(e.currentTarget)
     const newCasting: Casting = {
-      id: `c${Date.now()}`,
+      id: '',
       projectId: project.id,
       roleName: form.get('roleName') as string,
       description: (form.get('description') as string) || undefined,
@@ -23,7 +23,7 @@ export function ProjectDetailView({ project, onBack, onCastingClick, onCastingCr
       status: 'open',
       rounds: [],
     }
-    onCastingCreate(project.id, newCasting)
+    await onCastingCreate(project.id, newCasting)
     setShowForm(false)
   }
 

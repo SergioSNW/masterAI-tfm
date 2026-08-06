@@ -1,4 +1,4 @@
-import { get, put } from './api'
+import { get, post, put } from './api'
 
 export interface CastingDTO {
   id: string
@@ -10,6 +10,17 @@ export interface CastingDTO {
   activePhase?: string
   createdAt: string
   updatedAt: string
+}
+
+export interface CreateCastingInput {
+  projectId: string
+  roleName: string
+  description?: string
+  requirements?: string
+}
+
+export async function createCasting(input: CreateCastingInput): Promise<CastingDTO> {
+  return post<CastingDTO>('/castings/create', input)
 }
 
 export interface OpenCastingDTO {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom'
-import { Toaster } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import { getProfile } from './services/profileService'
 import { ProjectProvider, useProjectContext } from './context/ProjectContext'
 import { ProjectsView } from './views/ProjectsView'
@@ -15,6 +15,8 @@ import { PersonaSelector } from './views/PersonaSelector'
 import { ActorPortalView } from './views/ActorPortalView'
 import { createProject, fetchDashboard } from './services/projectService'
 import type { CreateProjectInput } from './services/projectService'
+import { createCasting } from './services/castingService'
+import { createRound } from './services/roundService'
 import type { Project, Casting, Round } from './data/mock'
 
 /* ── Route Wrappers ── */
@@ -51,12 +53,35 @@ function ProjectDetailRoute() {
   const project = projects.find(p => p.id === id)
   if (!project) return <Navigate to="/projects" />
 
+  async function handleCastingCreate(projectId: string, casting: Casting) {
+    try {
+      const res = await createCasting({
+        projectId,
+        roleName: casting.roleName,
+        description: casting.description,
+        requirements: casting.requirements,
+      })
+      addCasting(projectId, {
+        id: res.id,
+        projectId,
+        roleName: res.roleName,
+        description: res.description,
+        requirements: res.requirements,
+        status: res.status as Casting['status'],
+        rounds: [],
+      })
+      toast.success('Casting created')
+    } catch {
+      toast.error('Failed to create casting')
+    }
+  }
+
   return (
     <ProjectDetailView
       project={project}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/projects')}
       onCastingClick={(castingId) => navigate(`/casting/${castingId}`)}
-      onCastingCreate={(projectId, casting) => addCasting(projectId, casting)}
+      onCastingCreate={handleCastingCreate}
     />
   )
 }
@@ -75,12 +100,37 @@ function CastingDetailRoute() {
 
   if (!casting) return <Navigate to="/projects" />
 
+  async function handleRoundCreate(castingId: string, round: Round) {
+    try {
+      const res = await createRound({
+        castingId,
+        name: round.name,
+        description: round.description,
+        deadline: round.deadline,
+        order: round.order,
+      })
+      addRound(castingId, {
+        id: res.id,
+        castingId,
+        name: res.name,
+        description: res.description,
+        deadline: res.deadline,
+        order: res.order,
+        status: res.status as Round['status'],
+        submissions: [],
+      })
+      toast.success('Round created')
+    } catch {
+      toast.error('Failed to create round')
+    }
+  }
+
   return (
     <CastingDetailView
       casting={casting}
       onBack={() => navigate(`/project/${parentProjectId}`)}
       onRoundClick={(roundId) => navigate(`/round/${roundId}`)}
-      onRoundCreate={(castingId, round) => addRound(castingId, round)}
+      onRoundCreate={handleRoundCreate}
     />
   )
 }
@@ -129,7 +179,7 @@ export default function App() {
   const path = useActiveRoute()
   const profile = getProfile()
   const isSelector = path === '/'
-  const isActor = path.startsWith('/actor')
+  const isActor = path === '/actor' || path.startsWith('/actor/')
   const [projects, setProjects] = useState<Project[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
 

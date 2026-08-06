@@ -120,8 +120,8 @@ describe('CloseProjectSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('rejects invalid projectId', () => {
-    const result = CloseProjectSchema.safeParse({ projectId: 'bad', directorId: crypto.randomUUID() })
+  it('rejects empty projectId', () => {
+    const result = CloseProjectSchema.safeParse({ projectId: '', directorId: crypto.randomUUID() })
     expect(result.success).toBe(false)
   })
 })
@@ -132,8 +132,8 @@ describe('CloseCastingSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('rejects invalid uuid', () => {
-    const result = CloseCastingSchema.safeParse({ castingId: 'bad' })
+  it('rejects empty castingId', () => {
+    const result = CloseCastingSchema.safeParse({ castingId: '' })
     expect(result.success).toBe(false)
   })
 })
@@ -214,8 +214,8 @@ describe('ListAttachmentsSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('rejects invalid uuid', () => {
-    const result = ListAttachmentsSchema.safeParse({ roundId: 'bad' })
+  it('rejects empty roundId', () => {
+    const result = ListAttachmentsSchema.safeParse({ roundId: '' })
     expect(result.success).toBe(false)
   })
 })

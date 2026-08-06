@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const AddAttachmentSchema = z.object({
-  roundId: z.string().uuid(),
+  roundId: z.string().min(1),
   fileName: z.string().min(1).max(300),
   fileType: z.string().min(1).max(100),
   url: z.string().url(),
@@ -9,5 +9,5 @@ export const AddAttachmentSchema = z.object({
 })
 
 export const ListAttachmentsSchema = z.object({
-  roundId: z.string().uuid(),
+  roundId: z.string().min(1),
 })

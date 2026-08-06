@@ -8,7 +8,7 @@ interface Props {
   casting: Casting
   onBack: () => void
   onRoundClick: (id: string) => void
-  onRoundCreate: (castingId: string, round: Round) => void
+  onRoundCreate: (castingId: string, round: Round) => Promise<void>
 }
 
 const PHASES = ['First Round', 'Callback', 'Closed']
@@ -56,11 +56,11 @@ function PhaseDropdown({ castingId, activePhase: initialPhase }: { castingId: st
 export function CastingDetailView({ casting, onBack, onRoundClick, onRoundCreate }: Props) {
   const [showForm, setShowForm] = useState(false)
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = new FormData(e.currentTarget)
     const newRound: Round = {
-      id: `r${Date.now()}`,
+      id: '',
       castingId: casting.id,
       name: form.get('name') as string,
       description: (form.get('description') as string) || undefined,
@@ -69,7 +69,7 @@ export function CastingDetailView({ casting, onBack, onRoundClick, onRoundCreate
       status: 'pending',
       submissions: [],
     }
-    onRoundCreate(casting.id, newRound)
+    await onRoundCreate(casting.id, newRound)
     setShowForm(false)
   }
 
