@@ -9,4 +9,8 @@ ARCHITECTURE_TEXTBOOK.md
 .vercel
 .env*
 .env.local
-
+eas.json
+app.json
+package-lock.json
+apps/mobile/package.json
+.vscode/
