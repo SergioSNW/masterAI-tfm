@@ -5,6 +5,7 @@ api/router.mjs
 *.log
 test-results/
 playwright-report/
+e2e/fixtures/
 ARCHITECTURE_TEXTBOOK.md
 .vercel
 .env*

@@ -25,6 +25,7 @@
     "dev:all:web": "concurrently -n web,mobile -c blue,magenta \"npm run dev:web\" \"npm run dev:mobile:web\"",
     "dev:api": "npx vercel dev --port 3000 --yes",
     "test:e2e": "npx playwright test --config e2e/playwright.config.ts",
+    "simulate:submission": "node e2e/simulate-submission.ts",
     "test:all": "npm test && npm run test:e2e",
     "maestro:studio": "maestro studio -w apps/mobile",
     "maestro:test": "maestro test apps/mobile/.maestro/",
