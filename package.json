@@ -26,6 +26,7 @@
     "dev:api": "npx vercel dev --port 3000 --yes",
     "test:e2e": "npx playwright test --config e2e/playwright.config.ts",
     "simulate:submission": "node e2e/simulate-submission.ts",
+    "simulate:document-upload": "node e2e/simulate-document-upload.ts",
     "test:all": "npm test && npm run test:e2e",
     "maestro:studio": "maestro studio -w apps/mobile",
     "maestro:test": "maestro test apps/mobile/.maestro/",
