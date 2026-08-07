@@ -62,22 +62,34 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
   async function handleUpload(file: File) {
     setUploading(true)
     try {
+      const fileType = file.type || 'application/octet-stream'
       const { url } = await upload(file.name, file, {
         handleUploadUrl: '/api/upload',
         access: 'public',
+        clientPayload: JSON.stringify({
+          fileName: file.name,
+          fileType,
+          fileSize: file.size,
+        }),
       })
       const attachment = await addAttachment({
         roundId: round.id,
         fileName: file.name,
-        fileType: file.type || 'application/octet-stream',
+        fileType,
         url,
         fileSize: file.size,
       })
       setAttachments(prev => [attachment, ...prev])
       toast.success('File uploaded')
     } catch (err) {
-      toast.error('Upload failed')
-      console.error(err)
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'object' && err !== null && 'error' in err
+            ? String((err as { error: unknown }).error)
+            : 'Unknown upload error'
+      console.error('[upload] failed:', message, err)
+      toast.error(`Upload failed: ${message.slice(0, 140)}`)
     } finally {
       setUploading(false)
     }

@@ -66,6 +66,7 @@ const ALLOWED_TYPES = [
   'text/plain',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/octet-stream',
   'video/mp4',
   'video/quicktime',
   'video/webm',
