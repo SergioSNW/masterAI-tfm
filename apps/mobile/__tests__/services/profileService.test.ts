@@ -1,9 +1,7 @@
 import { loadProfile, saveProfile } from '../../src/services/profileService'
 
-jest.mock('expo-file-system', () => ({
-  FileSystem: {
-    documentDirectory: '/mock-docs/',
-  },
+jest.mock('expo-file-system/legacy', () => ({
+  documentDirectory: '/mock-docs/',
   writeAsStringAsync: jest.fn(() => Promise.resolve()),
   readAsStringAsync: jest.fn(() => Promise.resolve('')),
   getInfoAsync: jest.fn(() => Promise.resolve({ exists: false })),

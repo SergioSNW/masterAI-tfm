@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import { ActorDTO } from './types'
 
 const PROFILE_FILE = `${FileSystem.documentDirectory}actor-profile.json`

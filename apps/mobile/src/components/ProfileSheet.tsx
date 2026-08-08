@@ -23,7 +23,7 @@ function initials(name: string): string {
 }
 
 interface Field {
-  key: string
+  key: keyof ActorDTO
   label: string
   placeholder?: string
 }
@@ -104,15 +104,15 @@ export function ProfileSheet({ visible, onClose }: Props) {
                 {editing ? (
                   <TextInput
                     style={styles.fieldInput}
-                    value={draft[field.key as keyof ActorDTO] ?? ''}
+                    value={draft[field.key] ?? ''}
                     onChangeText={v => setValue(field.key, v)}
                     placeholder={field.placeholder}
                     placeholderTextColor={colors.text.tertiary}
                     autoCapitalize="none"
                   />
                 ) : (
-                  <Text style={[styles.fieldValue, !(draft as Record<string, string>)[field.key] && styles.fieldEmpty]}>
-                    {(draft as Record<string, string>)[field.key] || field.placeholder || '—'}
+                  <Text style={[styles.fieldValue, !draft[field.key] && styles.fieldEmpty]}>
+                    {draft[field.key] || field.placeholder || '—'}
                   </Text>
                 )}
               </View>
