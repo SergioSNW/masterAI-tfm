@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fetchOpenCastings } from '../services/castingService'
 import type { OpenCastingDTO } from '../services/castingService'
+import { UploadVideoModal } from '../components/UploadVideoModal'
 
 const ACTOR_ID = import.meta.env.VITE_ACTOR_ID ?? 'a1'
 
@@ -16,6 +17,7 @@ export function ActorPortalView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<OpenCastingDTO | null>(null)
+  const [showUpload, setShowUpload] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -29,6 +31,11 @@ export function ActorPortalView() {
   }
 
   useEffect(() => { load() }, [])
+
+  function handleUploadSuccess() {
+    setShowUpload(false)
+    load()
+  }
 
   return (
     <div className="animate-in">
@@ -125,8 +132,22 @@ export function ActorPortalView() {
                 )}
               </div>
             )}
+            {selected.roundStatus === 'open' && !selected.submission && (
+              <div style={{ marginTop: 20, borderTop: '1px solid var(--glass-border)', paddingTop: 16 }}>
+                <button className="btn btn-primary" onClick={() => setShowUpload(true)}>Upload Video Submission</button>
+              </div>
+            )}
           </div>
         </div>
+      )}
+
+      {showUpload && selected && (
+        <UploadVideoModal
+          castingId={selected.id}
+          actorId={ACTOR_ID}
+          onClose={() => setShowUpload(false)}
+          onSuccess={handleUploadSuccess}
+        />
       )}
     </div>
   )

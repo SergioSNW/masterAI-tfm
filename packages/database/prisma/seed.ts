@@ -108,6 +108,7 @@ const demoCastings: DemoCasting[] = [
   { id: 'c1', projectId: 'p1', roleName: 'Lead Role — Lady Victoria', description: 'A sophisticated aristocrat navigating post-war British high society.', requirements: 'British accent, age 30-45, period drama experience', status: 'open' },
   { id: 'c2', projectId: 'p1', roleName: 'Supporting — Margaret', description: 'A sharp-tongued housekeeper with a hidden past.', requirements: 'Cockney accent a plus, age 40-60', status: 'open' },
   { id: 'c3', projectId: 'p2', roleName: 'Recurring — Chemist', description: 'A brilliant but unstable organic chemist.', requirements: 'Must be comfortable with intense scenes', status: 'open' },
+  { id: 'c5', projectId: 'p1', roleName: 'Guest — Lady Sarah', description: 'A visiting duchess with a hidden agenda at court.', requirements: 'British accent, age 35-50, period drama experience', status: 'open' },
 ]
 
 const demoRounds: DemoRound[] = [
@@ -115,6 +116,7 @@ const demoRounds: DemoRound[] = [
   { id: 'r2', castingId: 'c1', name: 'Callback — In-Person', description: 'Live audition with the director', deadline: new Date('2026-09-01T23:59:59Z'), order: 1, status: 'pending' },
   { id: 'r3', castingId: 'c2', name: 'Self-Tape Submission', description: 'Submit a 90-second scene', deadline: new Date('2026-08-20T23:59:59Z'), order: 0, status: 'open' },
   { id: 'r4', castingId: 'c3', name: 'Video Submission', description: 'Submit a cold read of provided script', deadline: new Date('2026-08-10T23:59:59Z'), order: 0, status: 'open' },
+  { id: 'r5', castingId: 'c5', name: 'Self-Tape Submission', description: 'Submit a 90-second monologue in character', deadline: new Date('2026-09-05T23:59:59Z'), order: 0, status: 'open' },
 ]
 
 const demoSubmissions: DemoSubmission[] = [

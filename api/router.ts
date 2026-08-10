@@ -291,6 +291,7 @@ async function listCastings(req: VercelRequest, res: VercelResponse) {
       deadline: round?.deadline ? round.deadline.toISOString() : undefined,
       status: c.status,
       roundId: round?.id,
+      roundStatus: round?.status,
       submission: submission
         ? {
             status: submission.status,

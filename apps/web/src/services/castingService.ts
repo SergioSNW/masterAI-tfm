@@ -33,6 +33,7 @@ export interface OpenCastingDTO {
   deadline?: string
   status: string
   roundId?: string
+  roundStatus?: string
   submission?: {
     status: string
     feedback?: string

@@ -374,7 +374,7 @@ export function RoundDetailView({ round, onBack, onReview, onRoundStatusChange }
 
       {showUpload && (
         <UploadVideoModal
-          roundId={round.id}
+          castingId={round.castingId}
           onClose={() => setShowUpload(false)}
           onSuccess={() => {}}
         />

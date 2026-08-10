@@ -25,6 +25,17 @@ export interface ReviewInput {
   feedback?: string
 }
 
+export interface CreateSubmissionInput {
+  castingId: string
+  actorId: string
+  videoUrl: string
+  notes?: string
+}
+
+export async function createSubmission(input: CreateSubmissionInput): Promise<SubmissionDTO> {
+  return post<SubmissionDTO>('/submissions', input)
+}
+
 export async function uploadVideo(input: UploadVideoInput): Promise<SubmissionDTO> {
   return post<SubmissionDTO>('/submissions/upload', input)
 }
