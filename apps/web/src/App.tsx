@@ -138,7 +138,7 @@ function CastingDetailRoute() {
 function RoundDetailRoute() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { projects } = useProjectContext()
+  const { projects, updateRoundStatus } = useProjectContext()
 
   let round: Round | undefined
   let parentCastingId: string | undefined
@@ -156,6 +156,7 @@ function RoundDetailRoute() {
     <RoundDetailView
       round={round}
       onBack={() => navigate(`/casting/${parentCastingId}`)}
+      onRoundStatusChange={updateRoundStatus}
     />
   )
 }

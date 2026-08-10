@@ -23,3 +23,11 @@ export interface RoundDTO {
 export async function createRound(input: CreateRoundInput): Promise<RoundDTO> {
   return post<RoundDTO>('/rounds/create', input)
 }
+
+export async function openRound(roundId: string): Promise<RoundDTO> {
+  return post<RoundDTO>('/rounds/open', { roundId })
+}
+
+export async function closeRound(roundId: string): Promise<RoundDTO> {
+  return post<RoundDTO>('/rounds/close', { roundId })
+}

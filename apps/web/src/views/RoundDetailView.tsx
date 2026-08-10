@@ -14,9 +14,10 @@ interface Props {
   round: Round
   onBack: () => void
   onReview?: (submissionId: string, status: 'shortlisted' | 'reviewed' | 'rejected', feedback?: string) => void
+  onRoundStatusChange?: (roundId: string, status: 'open' | 'closed') => void
 }
 
-export function RoundDetailView({ round, onBack, onReview }: Props) {
+export function RoundDetailView({ round, onBack, onReview, onRoundStatusChange }: Props) {
   const [submissions, setSubmissions] = useState<Submission[]>(round.submissions)
   const [selected, setSelected] = useState<Submission | null>(null)
   const [feedback, setFeedback] = useState('')
@@ -154,6 +155,16 @@ export function RoundDetailView({ round, onBack, onReview }: Props) {
         </div>
         <div className="detail-header-right">
           <span className={`badge badge-${round.status}`}>{round.status}</span>
+          {round.status === 'pending' && (
+            <button className="btn btn-primary" onClick={() => onRoundStatusChange?.(round.id, 'open')}>
+              Open Round
+            </button>
+          )}
+          {round.status === 'open' && (
+            <button className="btn btn-ghost" onClick={() => onRoundStatusChange?.(round.id, 'closed')}>
+              Close Round
+            </button>
+          )}
           {round.status === 'open' && (
             <button className="btn btn-primary" onClick={() => setShowUpload(true)}>
               + Upload Video
