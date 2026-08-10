@@ -329,7 +329,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 9999;
   animation: fadeIn 200ms ease-out;
 }
 
@@ -417,7 +417,7 @@ body {
 }
 
 .animate-in {
-  animation: slideUp 400ms ease-out both;
+  animation: slideUp 400ms ease-out backwards;
 }
 
 .animate-in-d1 { animation-delay: 50ms; }
