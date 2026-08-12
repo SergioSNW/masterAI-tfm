@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { fetchOpenCastings } from '../services/castingService'
 import type { OpenCastingDTO } from '../services/castingService'
 import { UploadVideoModal } from '../components/UploadVideoModal'
+import { fetchAttachments } from '../services/attachmentService'
+import type { AttachmentDTO } from '../services/attachmentService'
+import { FileText, ExternalLink } from 'lucide-react'
 
 const ACTOR_ID = import.meta.env.VITE_ACTOR_ID ?? 'a1'
 
@@ -18,6 +21,22 @@ export function ActorPortalView() {
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<OpenCastingDTO | null>(null)
   const [showUpload, setShowUpload] = useState(false)
+  const [attachments, setAttachments] = useState<AttachmentDTO[]>([])
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+
+  useEffect(() => {
+    if (!selected?.roundId) {
+      setAttachments([])
+      return
+    }
+    setAttachmentsLoading(true)
+    fetchAttachments(selected.roundId)
+      .then(data => {
+        setAttachments(data)
+        setAttachmentsLoading(false)
+      })
+      .catch(() => setAttachmentsLoading(false))
+  }, [selected?.roundId])
 
   const load = () => {
     setLoading(true)
@@ -118,6 +137,37 @@ export function ActorPortalView() {
                 <span style={{ color: 'var(--text-secondary)' }}>{selected.requirements}</span>
               </div>
             )}
+
+            {attachmentsLoading ? (
+              <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 20, padding: '8px 0' }}>Loading materials...</div>
+            ) : attachments.length > 0 ? (
+              <div style={{ marginTop: 20 }}>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10 }}>Materials</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {attachments.map(a => (
+                    <a
+                      key={a.id}
+                      href={a.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass glass-hover"
+                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 'var(--radius-sm)', textDecoration: 'none' }}
+                    >
+                      <span style={{ display: 'flex', color: 'var(--text-secondary)' }}>
+                        <FileText size={18} />
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.fileName}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+                          {a.fileType} · {(a.fileSize / 1024).toFixed(1)} KB · {new Date(a.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <ExternalLink size={16} style={{ flexShrink: 0, color: 'var(--text-tertiary)' }} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             {selected.submission && (
               <div style={{ marginTop: 20, borderTop: '1px solid var(--glass-border)', paddingTop: 16 }}>

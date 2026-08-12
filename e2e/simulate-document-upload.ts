@@ -33,7 +33,9 @@ async function main() {
   console.log(`[api] base = ${API_BASE}`)
 
   const castings = await fetchJson<Array<{ id: string; title: string; roundId?: string }>>('/castings')
-  const target = castings.find(c => c.roundId)
+  const target = process.env.ROUND_ID
+    ? castings.find(c => c.roundId === process.env.ROUND_ID)
+    : castings.find(c => c.roundId)
   if (!target?.roundId) throw new Error('No open casting with a round found')
   const { id: castingId, roundId, title } = target
   console.log(`[round] using "${title}" (casting=${castingId}, round=${roundId})`)
