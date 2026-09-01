@@ -12,6 +12,6 @@ ARCHITECTURE_TEXTBOOK.md
 .env.local
 eas.json
 app.json
-package-lock.json
-apps/mobile/package.json
+*Zone.Identifier
+
 .vscode/

@@ -20,10 +20,10 @@ export function DocsView() {
         {/* ── Tech Stack ── */}
         <Section title="Tech Stack">
           <TwoCol>
-            <TechCard icon="⚛️" title="Frontend (Director)" items={['React 19 + Vite', 'TypeScript strict', 'Hash-based SPA routing', 'visionOS glass design']} />
-            <TechCard icon="📱" title="Frontend (Actor)" items={['Expo SDK 52', 'React Native + expo-router', 'Same glass design system', 'Compiles to web + native']} />
-            <TechCard icon="⚡" title="Backend" items={['Vercel Serverless Functions', '15 API endpoints (REST)', 'Zod validation on all inputs', '10s max duration']} />
-            <TechCard icon="🗄️" title="Data" items={['Neon.tech PostgreSQL', 'Prisma ORM (8 models)', 'Base64 video in bytea columns', 'Connection pooling via pgBouncer']} />
+            <TechCard icon="⚛️" title="Frontend (Director)" items={['React 19 + Vite', 'TypeScript strict', 'react-router-dom (browser routing)', 'visionOS glass design']} />
+            <TechCard icon="📱" title="Frontend (Actor)" items={['Expo SDK 54', 'React Native + expo-router', 'Same glass design system', 'Compiles to web + native']} />
+            <TechCard icon="⚡" title="Backend" items={['Vercel Serverless Functions', '26 API endpoints (REST)', 'Zod validation on all inputs', '10s max duration']} />
+            <TechCard icon="🗄️" title="Data" items={['Neon.tech PostgreSQL', 'Prisma ORM (8 models)', 'Video via Cloudinary, docs via Vercel Blob', 'Connection pooling via pgBouncer']} />
             <TechCard icon="🔧" title="Infrastructure" items={['npm workspaces monorepo', '7 packages across 4 layers', 'n8n for workflow orchestration', 'Vercel + GitHub CI']} />
           </TwoCol>
         </Section>
@@ -42,7 +42,7 @@ export function DocsView() {
             <ERDArrow />
             <ERDTable name="Attachment" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'url (Vercel Blob)', 'fileName', 'fileType', 'fileSize (int)', 'createdAt']} color="#eab308" />
             <ERDArrow style={{ opacity: 0.3 }} />
-            <ERDTable name="Submission" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'actorId (FK → Actor)', 'videoUrl (bytea as Base64)', 'thumbnailUrl?', 'notes?', 'status (pending|reviewed|shortlisted|rejected)', 'feedback?', 'timestamps']} color="#eab308" />
+            <ERDTable name="Submission" fields={['id (UUID, PK)', 'roundId (FK → Round)', 'actorId (FK → Actor)', 'videoUrl (Cloudinary URL, or base64 data URL for manual uploads)', 'thumbnailUrl?', 'notes?', 'status (pending|reviewed|shortlisted|rejected)', 'feedback?', 'transcript?', 'aiScore?', 'aiFeedback?', 'timestamps']} color="#eab308" />
             <ERDArrow style={{ opacity: 0.3 }} />
             <ERDTable name="Comment" fields={['id (UUID, PK)', 'submissionId (FK → Submission)', 'authorName', 'content', 'timestamps']} color="#a855f7" />
             <ERDArrow style={{ opacity: 0.3 }} />
@@ -55,28 +55,40 @@ export function DocsView() {
           <p style={{ marginBottom: 16 }}>All endpoints are Vercel serverless functions at <code style={codeStyle}>/api/*</code>. Every write endpoint validates input with Zod and returns a <code style={codeStyle}>Result{'<'}T{'>'}</code> discriminated union.</p>
           <Endpoint method="GET" path="/api/actors" desc="List all actors. Optional ?search= query for name/email filter." />
           <Endpoint method="POST" path="/api/actors/create" desc="Create a new actor. Validates unique email." body='{ "name": string, "email": string, "phone"?: string }' />
+          <Endpoint method="PUT" path="/api/actors/:id" desc="Update an actor's profile fields." />
+          <Endpoint method="DELETE" path="/api/actors/:id" desc="Delete an actor." />
+          <Endpoint method="GET" path="/api/projects" desc="List all projects." />
           <Endpoint method="POST" path="/api/projects/create" desc="Create a project. directorId must reference an existing director." />
           <Endpoint method="POST" path="/api/projects/close" desc="Close a project. Validates ownership." />
+          <Endpoint method="PUT" path="/api/projects/:id/status" desc="Update a project's status (draft, active, closed)." />
+          <Endpoint method="GET" path="/api/dashboard" desc="Full director dashboard tree: projects → castings → rounds → submissions." />
+          <Endpoint method="GET" path="/api/castings" desc="List open castings with their current round. Optional ?actorId= to include that actor's submission status." />
           <Endpoint method="POST" path="/api/castings/create" desc="Create a casting. The referenced project must be active." />
           <Endpoint method="POST" path="/api/castings/close" desc="Close an open casting." />
+          <Endpoint method="PUT" path="/api/castings/:id/phase" desc="Move a casting to a different audition phase." />
           <Endpoint method="POST" path="/api/rounds/create" desc="Create a round under an open casting." />
           <Endpoint method="POST" path="/api/rounds/open" desc="Open a pending round." />
           <Endpoint method="POST" path="/api/rounds/close" desc="Close an open round." />
-          <Endpoint method="POST" path="/api/submissions/upload" desc="Manual video upload. Base64, max 5MB, .mp4/.mov/.webm only." />
-           <Endpoint method="POST" path="/api/submissions/review" desc="Review a submission. Status can be reviewed, shortlisted, or rejected." />
-           <Endpoint method="POST" path="/api/submissions/comment" desc="Add a comment to a submission. Author name and content are required." />
-           <Endpoint method="GET" path="/api/submissions/comments" desc="List comments for a submission. Query: ?submissionId=" />
-           <Endpoint method="POST" path="/api/rounds/attachment" desc="Upload a file attachment to a round. Base64, max 10MB." />
-           <Endpoint method="GET" path="/api/rounds/attachments" desc="List attachments for a round. Query: ?roundId=" />
+          <Endpoint method="POST" path="/api/rounds/attachment" desc="Attach a file (already uploaded to Vercel Blob) to a round. Max 50MB." />
+          <Endpoint method="GET" path="/api/rounds/attachments" desc="List attachments for a round. Query: ?roundId=" />
+          <Endpoint method="DELETE" path="/api/rounds/attachment/:id" desc="Remove an attachment." />
+          <Endpoint method="POST" path="/api/submissions" desc="Create a submission from a Cloudinary video URL (actor portal path)." />
+          <Endpoint method="POST" path="/api/submissions/upload" desc="Manual video upload for directors. Base64, max 5MB, .mp4/.mov/.webm only." />
+          <Endpoint method="POST" path="/api/submissions/review" desc="Review a submission. Status can be reviewed, shortlisted, or rejected." />
+          <Endpoint method="POST" path="/api/submissions/comment" desc="Add a comment to a submission. Author name and content are required." />
+          <Endpoint method="GET" path="/api/submissions/comments" desc="List comments for a submission. Query: ?submissionId=" />
+          <Endpoint method="POST" path="/api/analyze" desc="Run the AI analysis pipeline on a submission (Whisper transcription + GPT-4o-mini scoring)." />
+          <Endpoint method="POST" path="/api/upload" desc="Generate a signed Vercel Blob upload token for document/attachment uploads." />
+          <Endpoint method="POST" path="/api/cloudinary/sign" desc="Generate a signed Cloudinary upload signature for actor video submissions." />
         </Section>
 
         {/* ── Clean Architecture ── */}
         <Section title="Clean Architecture Layers">
           <TwoCol>
-            <TechCard icon="📦" title="Core (packages/core)" items={['Entity interfaces (8 types)', 'Use case classes (16)', 'Repository interfaces (8)', 'Result<T> discriminated union', 'Zero external dependencies']} />
+            <TechCard icon="📦" title="Core (packages/core)" items={['Entity interfaces (8 types)', 'Use case classes (24)', 'Repository interfaces (8)', 'Result<T> discriminated union', 'Zero external dependencies']} />
             <TechCard icon="🔌" title="Infrastructure (packages/infrastructure)" items={['Prisma schema & client', 'Prisma repo implementations', 'Zod validation schemas', 'Depends on Core only']} />
-            <TechCard icon="🌐" title="API (api/)" items={['15 Vercel serverless functions', 'Zod → Use Case → Response', 'No Express, no routing lib', '10s timeout, stateless']} />
-            <TechCard icon="🖥️" title="Web App (apps/web)" items={['React 19 + Vite SPA', 'Hash routing (no react-router)', 'visionOS glass design system', '5 views + 2 modals']} />
+            <TechCard icon="🌐" title="API (api/)" items={['26 routes in one router + 2 dedicated functions', 'Zod → Use Case → Response', 'No Express, custom regex router', '10s timeout, stateless']} />
+            <TechCard icon="🖥️" title="Web App (apps/web)" items={['React 19 + Vite SPA', 'react-router-dom (browser routing)', 'visionOS glass design system', '11 views + 4 modals']} />
           </TwoCol>
         </Section>
 

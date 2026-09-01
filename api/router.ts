@@ -47,6 +47,7 @@ import {
   CloseRoundUseCase,
   AddAttachmentUseCase,
   ListAttachmentsUseCase,
+  RemoveAttachmentUseCase,
   ManualUploadUseCase,
   ReviewSubmissionUseCase,
   CreateSubmissionUseCase,
@@ -387,6 +388,9 @@ async function listAttachments(req: VercelRequest, res: VercelResponse) {
 }
 
 async function removeAttachment(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const useCase = new RemoveAttachmentUseCase(new PrismaAttachmentRepository())
+  const result = await useCase.execute(params.id)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
   return res.status(200).json({ id: params.id, removed: true })
 }
 
