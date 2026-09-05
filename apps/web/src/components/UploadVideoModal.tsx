@@ -86,10 +86,12 @@ export function UploadVideoModal({ castingId, onClose, onSuccess, actorId }: Pro
     }
   }
 
+  const MAX_SIZE_BYTES = 100 * 1024 * 1024 // Cloudinary's free-tier upload ceiling
+
   function validateFile(f: File): string | null {
     const ext = f.name.toLowerCase().slice(f.name.lastIndexOf('.'))
     if (!['.mp4', '.mov', '.webm'].includes(ext)) return 'Only .mp4, .mov, and .webm files are allowed'
-    if (f.size > 5 * 1024 * 1024) return `File exceeds 5MB limit (${(f.size / 1024 / 1024).toFixed(1)}MB)`
+    if (f.size > MAX_SIZE_BYTES) return `File exceeds 100MB limit (${(f.size / 1024 / 1024).toFixed(1)}MB)`
     return null
   }
 
@@ -135,7 +137,7 @@ export function UploadVideoModal({ castingId, onClose, onSuccess, actorId }: Pro
           {actorSection}
 
           <div>
-            <label htmlFor="video-file" style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6 }}>Video File (.mp4, .mov, .webm — max 5MB)</label>
+            <label htmlFor="video-file" style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6 }}>Video File (.mp4, .mov, .webm — max 100MB)</label>
             <input
               id="video-file"
               ref={fileRef}
