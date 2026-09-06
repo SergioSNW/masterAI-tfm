@@ -84,7 +84,7 @@ export function HelpView() {
           <p>When a round is open, you can manually upload video submissions on behalf of actors.</p>
           <FeatureList items={[
             ['Upload flow', 'Open a round and click "+ Upload Video". Select an actor from the dropdown, choose a video file (.mp4, .mov, .webm), and add optional notes.'],
-            ['File size limit', 'The system enforces a 5MB limit for uploads. Files are encoded as Base64 and stored in the database.'],
+            ['File size limit', 'Videos upload directly to Cloudinary from your browser, up to 100MB. Only the resulting video URL is stored — the file itself never passes through our servers or database.'],
             ['Video preview', 'After upload, the video can be played directly in the review modal.'],
           ]} />
         </HelpSection>
@@ -93,8 +93,8 @@ export function HelpView() {
         <HelpSection title="Round Attachments">
           <p>Attach scripts, contracts, or reference materials to any round. Actors can view and download these files from the mobile app.</p>
           <FeatureList items={[
-            ['Adding an attachment', 'Open a round and click "+ Upload File" in the Attachments section. Select a PDF, image, or text file. The 10MB limit applies.'],
-            ['Supported formats', 'PDF documents, PNG/JPEG images, and plain text files are supported. Files are stored as Base64 in the database.'],
+            ['Adding an attachment', 'Open a round and click "+ Upload File" in the Attachments section. Select a PDF, image, or text file. The 50MB limit applies.'],
+            ['Supported formats', 'PDF documents, PNG/JPEG images, and plain text files are supported. Files upload directly to Vercel Blob storage — only the resulting URL is stored in the database.'],
             ['Downloading', 'Each attachment has a Download button. Click it to save the file locally. Actors see an "Open" button in their app.'],
           ]} />
         </HelpSection>
