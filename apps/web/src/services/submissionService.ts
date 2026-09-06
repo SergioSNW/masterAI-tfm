@@ -1,4 +1,4 @@
-import { post, get } from './api'
+import { post } from './api'
 
 export interface SubmissionDTO {
   id: string
@@ -38,10 +38,6 @@ export async function createSubmission(input: CreateSubmissionInput): Promise<Su
 
 export async function uploadVideo(input: UploadVideoInput): Promise<SubmissionDTO> {
   return post<SubmissionDTO>('/submissions/upload', input)
-}
-
-export async function fetchSubmissions(roundId: string): Promise<SubmissionDTO[]> {
-  return get<SubmissionDTO[]>(`/submissions?roundId=${roundId}`)
 }
 
 export async function reviewSubmission(input: ReviewInput): Promise<void> {
