@@ -1412,9 +1412,9 @@ Key configuration points:
 
 **Role in this project:** Runs unit and integration tests for:
 
-- `packages/core` (65 tests, 20 files) — pure business logic tests, one file per use case
+- `packages/core` (82 tests, 24 files) — pure business logic tests, one file per use case
 - `packages/infrastructure` (36 tests, 1 file) — Zod schema validation tests
-- `apps/web` (51 tests, 9 files) — React component and context tests with Testing Library
+- `apps/web` (96 tests, 19 files) — service-layer, component, and context tests with Testing Library
 
 **Why over Jest:**
 - **ESM support:** Vitest has native ESM support without configuration. Jest requires experimental flags or transform configuration.
@@ -2052,18 +2052,18 @@ The project implements a four-layer testing strategy:
                     │   E2E    │  Playwright (11 tests) + Maestro (6 flows, mobile)
                     │          │  Full browser / device automation
                 ┌───┴──────────┴───┐
-                │  Integration     │  Vitest + Testing Library (51 tests)
+                │  Integration     │  Vitest + Testing Library (96 tests)
                 │  (Web Components)│  Component rendering with mocked services
             ┌───┴──────────────────┴───┐
             │    Infrastructure Tests   │  Vitest (36 tests)
             │    (Zod Schema Validation)│  Schema validation correctness
         ┌───┴──────────────────────────┴───┐
-        │         Unit Tests               │  Vitest (65 tests) + Jest (29 tests)
+        │         Unit Tests               │  Vitest (82 tests) + Jest (35 tests)
         │    (Business Logic + Services)    │  Pure function/class testing
         └──────────────────────────────────┘
 ```
 
-### 19.2 Layer 1: Core Unit Tests (65 tests)
+### 19.2 Layer 1: Core Unit Tests (82 tests)
 
 **Tool:** Vitest with Node environment
 **Location:** `packages/core/__tests__/use-cases/`
@@ -2102,10 +2102,10 @@ test('CreateActorSchema rejects invalid email', () => {
 })
 ```
 
-### 19.4 Layer 3: Web Integration Tests (51 tests)
+### 19.4 Layer 3: Web Integration Tests (96 tests)
 
 **Tool:** Vitest + @testing-library/react + jsdom
-**Location:** `apps/web/src/__tests__/components/` and `apps/web/src/__tests__/views/`
+**Location:** `apps/web/src/__tests__/components/`, `.../views/`, and `.../services/`
 **Config:** `apps/web/vitest.config.ts`
 
 These tests render React components in a simulated DOM environment and verify user-visible behavior:
@@ -2117,9 +2117,11 @@ test('renders round name and description', async () => {
 })
 ```
 
+`__tests__/services/` covers the service layer directly (mocking `./api`'s `get`/`post`/`put`/`del`) rather than through a component: each service's success path, request shape, and — where the service implements one — its local-fallback-on-API-failure behavior.
+
 The setup file (`src/__tests__/setup.ts`) imports `@testing-library/jest-dom` for extended DOM matchers.
 
-### 19.5 Layer 4: Mobile Unit Tests (29 tests)
+### 19.5 Layer 4: Mobile Unit Tests (35 tests)
 
 **Tool:** Jest + jest-expo + @testing-library/react-native
 **Location:** `apps/mobile/__tests__/`
@@ -2174,12 +2176,12 @@ export default defineConfig({
 
 | Command | What It Runs | Approximate Time |
 |---------|-------------|-----------------|
-| `npm run test:core` | 65 core unit tests | ~ 2s |
+| `npm run test:core` | 82 core unit tests | ~ 2s |
 | `npm run test:infra` | 36 infrastructure tests | < 1s |
-| `npm run test:web` | 51 web integration tests | ~ 30s |
+| `npm run test:web` | 96 web integration tests | ~ 30s |
 | `npm run test` | All three above sequentially | ~ 35s |
 | `npm run test:e2e` | 11 Playwright E2E tests | ~ 15s |
-| `npm run test` (from apps/mobile) | 29 mobile tests | ~ 35s |
+| `npm run test` (from apps/mobile) | 35 mobile tests | ~ 35s |
 | `npm run maestro:test` | 6 Maestro device flows | requires a running simulator/device |
 | `npm run test:all` | Everything except Maestro | ~ 50s |
 
@@ -2187,13 +2189,13 @@ export default defineConfig({
 
 | Workspace | Tool | Files | Tests | Environment |
 |-----------|------|-------|-------|-------------|
-| packages/core | Vitest | 20 | 65 | Node |
+| packages/core | Vitest | 24 | 82 | Node |
 | packages/infrastructure | Vitest | 1 | 36 | Node |
-| apps/web | Vitest | 9 | 51 | jsdom |
-| apps/mobile | Jest | 7 | 29 | Native (jest-expo) |
+| apps/web | Vitest | 19 | 96 | jsdom |
+| apps/mobile | Jest | 9 | 35 | Native (jest-expo) |
 | e2e | Playwright | 1 | 11 | Chromium headless |
 | apps/mobile/.maestro | Maestro | 6 flows | — | Real device / simulator |
-| **Total (automated, non-Maestro)** | | **38** | **192** | |
+| **Total (automated, non-Maestro)** | | **54** | **260** | |
 
 ---
 
@@ -2283,7 +2285,7 @@ masterai-tfm/
 │   │   ├── repositories/           # 8 repository interfaces
 │   │   ├── services/                # IAIAnalysisService
 │   │   ├── use-cases/               # 24 use case classes
-│   │   └── __tests__/               # 65 tests, 20 files
+│   │   └── __tests__/               # 82 tests, 24 files
 │   │
 │   ├── database/                   # @masterai/database
 │   │   ├── package.json
@@ -2324,7 +2326,7 @@ masterai-tfm/
 │   │       ├── services/           # 10 API service modules
 │   │       ├── components/         # ~10 reusable components (modals, grids)
 │   │       ├── views/              # 11 routed views
-│   │       └── __tests__/          # 51 tests, 9 files
+│   │       └── __tests__/          # 96 tests, 19 files (incl. service-layer tests)
 │   │
 │   └── mobile/                     # Actor App
 │       ├── package.json
@@ -2343,7 +2345,7 @@ masterai-tfm/
 │       │   ├── theme/colors.ts     # Design tokens
 │       │   ├── components/         # 6 reusable components (incl. CameraRecorder)
 │       │   └── services/           # 8 service modules
-│       └── __tests__/              # 29 tests, 7 files
+│       └── __tests__/              # 35 tests, 9 files
 │
 └── e2e/                             # Playwright E2E + manual simulation scripts
     ├── playwright.config.ts
