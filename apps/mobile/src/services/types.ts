@@ -9,6 +9,7 @@ export interface CastingDTO {
   status: string
   roundId?: string
   submission?: {
+    id?: string
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | null
     feedback?: string
     submittedAt?: string

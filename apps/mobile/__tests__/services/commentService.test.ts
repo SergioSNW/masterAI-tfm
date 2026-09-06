@@ -1,41 +1,52 @@
+import { get } from '../../src/services/api'
 import { fetchComments } from '../../src/services/commentService'
+
+jest.mock('../../src/services/api', () => ({
+  get: jest.fn(),
+}))
+
+const mockedGet = get as jest.MockedFunction<typeof get>
+
+const mockComments = [
+  { id: 'c1', submissionId: 's1', authorName: 'Demo Director', content: 'Excellent presence and emotional range.', createdAt: '2026-07-11T00:00:00.000Z' },
+  { id: 'c2', submissionId: 's1', authorName: 'Casting Assistant', content: 'Agreed. Strong candidate for the lead role.', createdAt: '2026-07-12T00:00:00.000Z' },
+]
 
 describe('commentService', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    jest.clearAllMocks()
   })
 
-  afterEach(() => {
-    jest.useRealTimers()
-  })
+  it('fetchComments requests comments for the given submission', async () => {
+    mockedGet.mockResolvedValue(mockComments)
 
-  it('returns comments for shortlisted status', async () => {
-    const promise = fetchComments('shortlisted')
-    jest.advanceTimersByTime(400)
-    const comments = await promise
-    expect(comments.length).toBe(2)
+    const comments = await fetchComments('s1')
+
+    expect(mockedGet).toHaveBeenCalledWith('/submissions/comments?submissionId=s1')
+    expect(comments).toEqual(mockComments)
     expect(comments[0]).toHaveProperty('authorName')
     expect(comments[0]).toHaveProperty('content')
   })
 
-  it('returns comments for reviewed status', async () => {
-    const promise = fetchComments('reviewed')
-    jest.advanceTimersByTime(400)
-    const comments = await promise
-    expect(comments.length).toBe(1)
+  it('URL-encodes the submission id', async () => {
+    mockedGet.mockResolvedValue([])
+
+    await fetchComments('submission/with special')
+
+    expect(mockedGet).toHaveBeenCalledWith('/submissions/comments?submissionId=submission%2Fwith%20special')
   })
 
-  it('returns comments for rejected status', async () => {
-    const promise = fetchComments('rejected')
-    jest.advanceTimersByTime(400)
-    const comments = await promise
-    expect(comments.length).toBe(1)
-  })
+  it('returns an empty array when there are no comments', async () => {
+    mockedGet.mockResolvedValue([])
 
-  it('returns empty array for unknown status', async () => {
-    const promise = fetchComments('unknown')
-    jest.advanceTimersByTime(400)
-    const comments = await promise
+    const comments = await fetchComments('s-no-comments')
+
     expect(comments).toEqual([])
+  })
+
+  it('propagates a rejection when the request fails', async () => {
+    mockedGet.mockRejectedValue(new Error('network down'))
+
+    await expect(fetchComments('s1')).rejects.toThrow('network down')
   })
 })

@@ -1,41 +1,44 @@
-import { fetchAttachments, openAttachment } from '../../src/services/attachmentService'
+import { get } from '../../src/services/api'
+import { fetchAttachments } from '../../src/services/attachmentService'
+
+jest.mock('../../src/services/api', () => ({
+  get: jest.fn(),
+}))
+
+const mockedGet = get as jest.MockedFunction<typeof get>
+
+const mockAttachments = [
+  { id: 'a1', roundId: 'r1', fileName: 'Script_Scene_1.pdf', fileType: 'application/pdf', url: 'https://blob.vercel-storage.com/script.pdf', fileSize: 245000, createdAt: '2026-07-05T00:00:00.000Z' },
+  { id: 'a2', roundId: 'r1', fileName: 'Contract_Draft.pdf', fileType: 'application/pdf', url: 'https://blob.vercel-storage.com/contract.pdf', fileSize: 180000, createdAt: '2026-07-06T00:00:00.000Z' },
+]
 
 describe('attachmentService', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    jest.clearAllMocks()
   })
 
-  afterEach(() => {
-    jest.useRealTimers()
+  it('fetchAttachments requests attachments for the given round', async () => {
+    mockedGet.mockResolvedValue(mockAttachments)
+
+    const attachments = await fetchAttachments('r1')
+
+    expect(mockedGet).toHaveBeenCalledWith('/rounds/attachments?roundId=r1')
+    expect(attachments).toEqual(mockAttachments)
   })
 
-  it('fetchAttachments returns attachments for r1', async () => {
-    const promise = fetchAttachments('r1')
-    jest.advanceTimersByTime(500)
-    const attachments = await promise
-    expect(attachments.length).toBe(2)
-    expect(attachments[0].fileName).toBe('Script_Scene_1.pdf')
+  it('URL-encodes the round id', async () => {
+    mockedGet.mockResolvedValue([])
+
+    await fetchAttachments('round/with special chars')
+
+    expect(mockedGet).toHaveBeenCalledWith('/rounds/attachments?roundId=round%2Fwith%20special%20chars')
   })
 
-  it('fetchAttachments returns attachments for r2', async () => {
-    const promise = fetchAttachments('r2')
-    jest.advanceTimersByTime(500)
-    const attachments = await promise
-    expect(attachments.length).toBe(1)
-    expect(attachments[0].fileName).toBe('Character_Brief.pdf')
-  })
+  it('each attachment has the fields the UI relies on', async () => {
+    mockedGet.mockResolvedValue(mockAttachments)
 
-  it('fetchAttachments returns empty array for unknown round', async () => {
-    const promise = fetchAttachments('r999')
-    jest.advanceTimersByTime(500)
-    const attachments = await promise
-    expect(attachments).toEqual([])
-  })
+    const attachments = await fetchAttachments('r1')
 
-  it('each attachment has required fields', async () => {
-    const promise = fetchAttachments('r1')
-    jest.advanceTimersByTime(500)
-    const attachments = await promise
     for (const a of attachments) {
       expect(a).toHaveProperty('id')
       expect(a).toHaveProperty('roundId')
@@ -45,5 +48,11 @@ describe('attachmentService', () => {
       expect(a).toHaveProperty('fileSize')
       expect(a).toHaveProperty('createdAt')
     }
+  })
+
+  it('propagates a rejection when the request fails', async () => {
+    mockedGet.mockRejectedValue(new Error('network down'))
+
+    await expect(fetchAttachments('r1')).rejects.toThrow('network down')
   })
 })

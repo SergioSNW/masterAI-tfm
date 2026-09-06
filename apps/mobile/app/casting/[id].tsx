@@ -28,7 +28,7 @@ export default function CastingDetail() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const [localSubmission, setLocalSubmission] = useState<{ status: string; feedback?: string; submittedAt: string } | null>(null)
+  const [localSubmission, setLocalSubmission] = useState<{ id?: string; status: string; feedback?: string; submittedAt: string } | null>(null)
   const [comments, setComments] = useState<CommentDTO[]>([])
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [attachments, setAttachments] = useState<AttachmentDTO[]>([])
@@ -52,9 +52,9 @@ export default function CastingDetail() {
 
   useEffect(() => {
     const sub = localSubmission ?? casting?.submission
-    if (sub?.status && sub.status !== 'pending') {
+    if (sub?.id && sub.status && sub.status !== 'pending') {
       setCommentsLoading(true)
-      fetchComments(sub.status).then(data => {
+      fetchComments(sub.id).then(data => {
         setComments(data)
         setCommentsLoading(false)
       })
@@ -71,7 +71,7 @@ export default function CastingDetail() {
     try {
       const videoUrl = await uploadVideoToCloudinary(uri)
       const result = await submitCloudinaryVideo(casting, videoUrl)
-      setLocalSubmission({ status: result.status, feedback: result.feedback, submittedAt: result.submittedAt })
+      setLocalSubmission({ id: result.id, status: result.status, feedback: result.feedback, submittedAt: result.submittedAt })
     } catch {
       setUploadError('Upload failed. Check your connection and try again.')
     } finally {

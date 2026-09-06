@@ -295,6 +295,7 @@ async function listCastings(req: VercelRequest, res: VercelResponse) {
       roundStatus: round?.status,
       submission: submission
         ? {
+            id: submission.id,
             status: submission.status,
             feedback: submission.feedback ?? undefined,
             submittedAt: submission.createdAt.toISOString(),

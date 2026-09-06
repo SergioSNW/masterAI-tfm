@@ -14,6 +14,7 @@ interface RawCastingDTO {
   status: string
   roundId?: string
   submission?: {
+    id?: string
     status: string
     feedback?: string
     submittedAt?: string
@@ -39,6 +40,7 @@ export async function fetchOpenCastings(): Promise<CastingDTO[]> {
     roundId: item.roundId,
     submission: item.submission
       ? {
+          id: item.submission.id,
           status: item.submission.status as 'pending' | 'reviewed' | 'shortlisted' | 'rejected',
           feedback: item.submission.feedback,
           submittedAt: formatDate(item.submission.submittedAt),

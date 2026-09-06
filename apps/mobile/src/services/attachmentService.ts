@@ -1,6 +1,7 @@
 import { Platform, Linking, Alert } from 'react-native'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
+import { get } from './api'
 
 export interface AttachmentDTO {
   id: string
@@ -12,20 +13,8 @@ export interface AttachmentDTO {
   createdAt: string
 }
 
-const MOCK_ATTACHMENTS: Record<string, AttachmentDTO[]> = {
-  r1: [
-    { id: 'a1', roundId: 'r1', fileName: 'Script_Scene_1.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/script.pdf', fileSize: 245000, createdAt: 'Jul 5, 2026' },
-    { id: 'a2', roundId: 'r1', fileName: 'Contract_Draft.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/contract.pdf', fileSize: 180000, createdAt: 'Jul 6, 2026' },
-  ],
-  r2: [
-    { id: 'a3', roundId: 'r2', fileName: 'Character_Brief.pdf', fileType: 'application/pdf', url: 'https://blob.vercel.storage.com/brief.pdf', fileSize: 92000, createdAt: 'Jul 8, 2026' },
-  ],
-}
-
 export async function fetchAttachments(roundId: string): Promise<AttachmentDTO[]> {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(MOCK_ATTACHMENTS[roundId] ?? []), 400)
-  })
+  return get<AttachmentDTO[]>(`/rounds/attachments?roundId=${encodeURIComponent(roundId)}`)
 }
 
 export async function openAttachment(attachment: AttachmentDTO): Promise<void> {
