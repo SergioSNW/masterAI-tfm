@@ -16,6 +16,8 @@ Casting directors traditionally juggle email threads, shared drives, and spreads
 2. An **actor** browses open castings on their phone, records a self-tape in-app, and submits it.
 3. The director reviews submissions — watches the video, reads an **AI-generated transcript and score** (Whisper + GPT-4o-mini), leaves feedback, and shortlists or rejects.
 
+Actors can also edit their own name, contact info, agency, and bio from a Settings page in the web portal (`/actor/settings`) — the same `Actor` record the director-side actor management UI reads and edits, not a separate local profile.
+
 Two front ends, one API, one database:
 
 | | |
@@ -65,7 +67,7 @@ Strict Clean Architecture (Entities → Use Cases → Repository Interfaces → 
 
 ```
 apps/web (React SPA) ─┐
-                       ├──> api/ (26 routes, one Vercel function) ──> packages/infrastructure (Prisma + Zod)
+                       ├──> api/ (27 routes, one Vercel function) ──> packages/infrastructure (Prisma + Zod)
 apps/mobile (Expo)  ───┘                                                       │
                                                                                 ▼
                                                                     packages/core (zero deps)
@@ -75,10 +77,10 @@ apps/mobile (Expo)  ───┘                                                
                                                                     Neon.tech PostgreSQL
 ```
 
-- **`packages/core`** — 8 entities, 24 use cases, 8 repository interfaces. Pure TypeScript, no imports from anything else in the repo.
+- **`packages/core`** — 8 entities, 25 use cases, 8 repository interfaces. Pure TypeScript, no imports from anything else in the repo.
 - **`packages/infrastructure`** — Prisma repository implementations and 20 Zod validation schemas. The only layer allowed to import Prisma or Zod.
 - **`packages/database`** — the Prisma schema, generated client, and seed script.
-- **`api/`** — one hand-rolled router (`api/router.ts`) dispatching 26 routes by regex, plus two standalone functions for Cloudinary signing and Vercel Blob uploads.
+- **`api/`** — one hand-rolled router (`api/router.ts`) dispatching 27 routes by regex, plus two standalone functions for Cloudinary signing and Vercel Blob uploads.
 - **`apps/web`** / **`apps/mobile`** — thin UI layers; all business logic lives in `packages/core`.
 
 Full detail — every entity, every use case, full data-flow walkthroughs, the testing strategy, and the deployment setup — is in **[ARCHITECTURE_TEXTBOOK.md](./ARCHITECTURE_TEXTBOOK.md)**.
@@ -135,12 +137,12 @@ npm run dev:mobile:web  # Expo, opens in a browser
 
 ```bash
 npm run test          # core + infrastructure + web unit/integration tests
-npm run test:core      # 65 tests — use case business logic
+npm run test:core      # 84 tests — use case business logic
 npm run test:infra      # 36 tests — Zod schema validation
-npm run test:web         # 51 tests — React component/context tests
+npm run test:web         # 101 tests — service, component, and context tests
 npm run test:e2e          # 11 Playwright browser tests (needs the web app running)
 npm run test:all           # everything above
-npm test -w apps/mobile     # 29 tests
+npm test -w apps/mobile     # 35 tests
 npm run maestro:test         # 6 device-flow specs, needs a running simulator/device
 ```
 

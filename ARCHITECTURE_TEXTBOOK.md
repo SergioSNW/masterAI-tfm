@@ -128,7 +128,7 @@ The system is composed of five logical layers, each implemented as a separate np
 |-----------|-----------|------------|---------|
 | Core | `packages/core` | Pure TypeScript | Entities, use cases, repository interfaces |
 | Infrastructure | `packages/infrastructure` | Prisma, Zod | Database access, validation, repository implementations |
-| API | `api/` | Vercel Serverless | 27 HTTP endpoints (26 routed through one function, plus a dedicated Cloudinary signing function) bridging clients to business logic |
+| API | `api/` | Vercel Serverless | 28 HTTP endpoints (27 routed through one function, plus a dedicated Cloudinary signing function) bridging clients to business logic |
 | Web Dashboard | `apps/web` | React 19, Vite 6 | Director-facing SPA with glassmorphism UI |
 | Mobile App | `apps/mobile` | Expo SDK 54, React Native | Actor-facing cross-platform app |
 | Database | External | Neon.tech PostgreSQL | Managed serverless PostgreSQL |
@@ -618,19 +618,20 @@ Key structural elements:
 | 9 | `OpenRoundUseCase` | Rounds | IRoundRepository | Only pending rounds can be opened |
 | 10 | `CloseRoundUseCase` | Rounds | IRoundRepository | Only open rounds can be closed |
 | 11 | `CreateActorUseCase` | Actors | IActorRepository | Email uniqueness |
-| 12 | `ListActorsUseCase` | Actors | IActorRepository | Optional search filter |
-| 13 | `UpdateActorUseCase` | Actors | IActorRepository | Actor exists |
-| 14 | `DeleteActorUseCase` | Actors | IActorRepository | Actor exists |
-| 15 | `SubmitVideoUseCase` | Submissions | ISubmissionRepository, IRoundRepository, IActorRepository | Round open, not past deadline, actor exists, one per actor per round |
-| 16 | `CreateSubmissionUseCase` | Submissions | ISubmissionRepository, IRoundRepository, ICastingRepository, IActorRepository | Actor-portal path: submission from a Cloudinary `videoUrl` |
-| 17 | `ManualUploadUseCase` | Submissions | ISubmissionRepository, IRoundRepository, IActorRepository | All above + 5MB limit + .mp4/.mov/.webm only |
-| 18 | `ReviewSubmissionUseCase` | Submissions | ISubmissionRepository | Only pending submissions can be reviewed |
-| 19 | `GenerateAIAnalysisUseCase` | Submissions | ISubmissionRepository, IRoundRepository, ICastingRepository, IAIAnalysisService | Submission must have a video; maps AI service errors to typed results |
-| 20 | `CreateCommentUseCase` | Comments | ICommentRepository, ISubmissionRepository | Non-empty content, submission exists |
-| 21 | `ListCommentsUseCase` | Comments | ICommentRepository, ISubmissionRepository | Submission exists |
-| 22 | `AddAttachmentUseCase` | Attachments | IAttachmentRepository, IRoundRepository | Round exists, non-empty name, 50MB limit |
-| 23 | `ListAttachmentsUseCase` | Attachments | IAttachmentRepository, IRoundRepository | Round exists |
-| 24 | `RemoveAttachmentUseCase` | Attachments | IAttachmentRepository | Attachment exists |
+| 12 | `GetActorUseCase` | Actors | IActorRepository | Actor exists — backs the actor's own profile/settings view |
+| 13 | `ListActorsUseCase` | Actors | IActorRepository | Optional search filter |
+| 14 | `UpdateActorUseCase` | Actors | IActorRepository | Actor exists |
+| 15 | `DeleteActorUseCase` | Actors | IActorRepository | Actor exists |
+| 16 | `SubmitVideoUseCase` | Submissions | ISubmissionRepository, IRoundRepository, IActorRepository | Round open, not past deadline, actor exists, one per actor per round |
+| 17 | `CreateSubmissionUseCase` | Submissions | ISubmissionRepository, IRoundRepository, ICastingRepository, IActorRepository | Actor-portal path: submission from a Cloudinary `videoUrl` |
+| 18 | `ManualUploadUseCase` | Submissions | ISubmissionRepository, IRoundRepository, IActorRepository | All above + 5MB limit + .mp4/.mov/.webm only |
+| 19 | `ReviewSubmissionUseCase` | Submissions | ISubmissionRepository | Only pending submissions can be reviewed |
+| 20 | `GenerateAIAnalysisUseCase` | Submissions | ISubmissionRepository, IRoundRepository, ICastingRepository, IAIAnalysisService | Submission must have a video; maps AI service errors to typed results |
+| 21 | `CreateCommentUseCase` | Comments | ICommentRepository, ISubmissionRepository | Non-empty content, submission exists |
+| 22 | `ListCommentsUseCase` | Comments | ICommentRepository, ISubmissionRepository | Submission exists |
+| 23 | `AddAttachmentUseCase` | Attachments | IAttachmentRepository, IRoundRepository | Round exists, non-empty name, 50MB limit |
+| 24 | `ListAttachmentsUseCase` | Attachments | IAttachmentRepository, IRoundRepository | Round exists |
+| 25 | `RemoveAttachmentUseCase` | Attachments | IAttachmentRepository | Attachment exists |
 
 ### 7.3 Deep Dive: ManualUploadUseCase
 
@@ -1206,7 +1207,7 @@ const routes: Route[] = [
   defineRoute('GET', '/api/actors', listActors),
   defineRoute('POST', '/api/actors/create', createActor),
   defineRoute('PUT', '/api/actors/:id', updateActor),
-  // ...26 routes total, see §12.4
+  // ...27 routes total, see §12.4
 ]
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -1224,7 +1225,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 `vercel.json` (§12.5) rewrites every `/api/*` request except `/api/cloudinary/*` to `/api/router`, so this one function fields nearly the entire API surface. `POST /api/upload` (Vercel Blob) and `POST /api/cloudinary/sign` remain genuinely separate Vercel functions — they're listed alongside the routed endpoints in §12.4's table but aren't matched by `defineRoute`.
 
-The tradeoff: a single function means a single cold start and a single `10s` timeout budget shared however many concurrent requests land on it, and route dispatch is a linear scan rather than the platform's own routing table. For 26 routes at academic-demo traffic levels this is a non-issue; it would be worth splitting back out (or moving to a real router library) if traffic ever justified per-route scaling.
+The tradeoff: a single function means a single cold start and a single `10s` timeout budget shared however many concurrent requests land on it, and route dispatch is a linear scan rather than the platform's own routing table. For 27 routes at academic-demo traffic levels this is a non-issue; it would be worth splitting back out (or moving to a real router library) if traffic ever justified per-route scaling.
 
 ### 12.3 Handler Pattern
 
@@ -1254,30 +1255,31 @@ All routes below except `/api/upload` and `/api/cloudinary/sign` are handled by 
 | 1 | POST | `/api/upload` | — (Vercel Blob `handleUpload`) | Signed token for a direct-to-Blob document/attachment upload |
 | 2 | GET | `/api/actors` | ListActorsUseCase | List actors with optional search |
 | 3 | POST | `/api/actors/create` | CreateActorUseCase | Register a new actor |
-| 4 | PUT | `/api/actors/:id` | UpdateActorUseCase | Update an actor's profile |
-| 5 | DELETE | `/api/actors/:id` | DeleteActorUseCase | Delete an actor |
-| 6 | GET | `/api/projects` | ListProjectsUseCase | List all projects |
-| 7 | POST | `/api/projects/create` | CreateProjectUseCase | Create a new project |
-| 8 | POST | `/api/projects/close` | CloseProjectUseCase | Close a project |
-| 9 | PUT | `/api/projects/:id/status` | UpdateProjectStatusUseCase | Update a project's status |
-| 10 | GET | `/api/dashboard` | — (direct Prisma query) | Full director dashboard tree (projects → castings → rounds → submissions) |
-| 11 | GET | `/api/castings` | — (direct Prisma query) | List open castings with current round; `?actorId=` includes that actor's submission |
-| 12 | POST | `/api/castings/create` | CreateCastingUseCase | Create a casting for a project |
-| 13 | POST | `/api/castings/close` | CloseCastingUseCase | Close a casting |
-| 14 | PUT | `/api/castings/:id/phase` | UpdateCastingPhaseUseCase | Move a casting to a different phase |
-| 15 | POST | `/api/rounds/create` | CreateRoundUseCase | Create an audition round |
-| 16 | POST | `/api/rounds/open` | OpenRoundUseCase | Open a pending round |
-| 17 | POST | `/api/rounds/close` | CloseRoundUseCase | Close an open round |
-| 18 | POST | `/api/rounds/attachment` | AddAttachmentUseCase | Attach an already-uploaded Blob file to a round |
-| 19 | GET | `/api/rounds/attachments` | ListAttachmentsUseCase | List attachments for a round |
-| 20 | DELETE | `/api/rounds/attachment/:id` | RemoveAttachmentUseCase | Remove an attachment |
-| 21 | POST | `/api/submissions` | CreateSubmissionUseCase | Create a submission from a Cloudinary video URL (actor portal) |
-| 22 | POST | `/api/submissions/upload` | ManualUploadUseCase | Upload a video submission (Base64, director-side legacy path) |
-| 23 | POST | `/api/submissions/review` | ReviewSubmissionUseCase | Review/shortlist/reject a submission |
-| 24 | POST | `/api/submissions/comment` | CreateCommentUseCase | Add a comment to a submission |
-| 25 | GET | `/api/submissions/comments` | ListCommentsUseCase | List comments for a submission |
-| 26 | POST | `/api/analyze` | GenerateAIAnalysisUseCase | Run Whisper + GPT-4o-mini analysis on a submission |
-| 27 | GET | `/api/cloudinary/sign` | — (Cloudinary SDK) | Signed upload signature for actor video submissions |
+| 4 | GET | `/api/actors/:id` | GetActorUseCase | Fetch a single actor — backs the actor's own profile/settings view |
+| 5 | PUT | `/api/actors/:id` | UpdateActorUseCase | Update an actor's profile |
+| 6 | DELETE | `/api/actors/:id` | DeleteActorUseCase | Delete an actor |
+| 7 | GET | `/api/projects` | ListProjectsUseCase | List all projects |
+| 8 | POST | `/api/projects/create` | CreateProjectUseCase | Create a new project |
+| 9 | POST | `/api/projects/close` | CloseProjectUseCase | Close a project |
+| 10 | PUT | `/api/projects/:id/status` | UpdateProjectStatusUseCase | Update a project's status |
+| 11 | GET | `/api/dashboard` | — (direct Prisma query) | Full director dashboard tree (projects → castings → rounds → submissions) |
+| 12 | GET | `/api/castings` | — (direct Prisma query) | List open castings with current round; `?actorId=` includes that actor's submission |
+| 13 | POST | `/api/castings/create` | CreateCastingUseCase | Create a casting for a project |
+| 14 | POST | `/api/castings/close` | CloseCastingUseCase | Close a casting |
+| 15 | PUT | `/api/castings/:id/phase` | UpdateCastingPhaseUseCase | Move a casting to a different phase |
+| 16 | POST | `/api/rounds/create` | CreateRoundUseCase | Create an audition round |
+| 17 | POST | `/api/rounds/open` | OpenRoundUseCase | Open a pending round |
+| 18 | POST | `/api/rounds/close` | CloseRoundUseCase | Close an open round |
+| 19 | POST | `/api/rounds/attachment` | AddAttachmentUseCase | Attach an already-uploaded Blob file to a round |
+| 20 | GET | `/api/rounds/attachments` | ListAttachmentsUseCase | List attachments for a round |
+| 21 | DELETE | `/api/rounds/attachment/:id` | RemoveAttachmentUseCase | Remove an attachment |
+| 22 | POST | `/api/submissions` | CreateSubmissionUseCase | Create a submission from a Cloudinary video URL (actor portal) |
+| 23 | POST | `/api/submissions/upload` | ManualUploadUseCase | Upload a video submission (Base64, director-side legacy path) |
+| 24 | POST | `/api/submissions/review` | ReviewSubmissionUseCase | Review/shortlist/reject a submission |
+| 25 | POST | `/api/submissions/comment` | CreateCommentUseCase | Add a comment to a submission |
+| 26 | GET | `/api/submissions/comments` | ListCommentsUseCase | List comments for a submission |
+| 27 | POST | `/api/analyze` | GenerateAIAnalysisUseCase | Run Whisper + GPT-4o-mini analysis on a submission |
+| 28 | GET | `/api/cloudinary/sign` | — (Cloudinary SDK) | Signed upload signature for actor video submissions |
 
 ### 12.5 Vercel Configuration
 
@@ -1412,9 +1414,9 @@ Key configuration points:
 
 **Role in this project:** Runs unit and integration tests for:
 
-- `packages/core` (82 tests, 24 files) — pure business logic tests, one file per use case
+- `packages/core` (84 tests, 25 files) — pure business logic tests, one file per use case
 - `packages/infrastructure` (36 tests, 1 file) — Zod schema validation tests
-- `apps/web` (96 tests, 19 files) — service-layer, component, and context tests with Testing Library
+- `apps/web` (101 tests, 20 files) — service-layer, component, and context tests with Testing Library
 
 **Why over Jest:**
 - **ESM support:** Vitest has native ESM support without configuration. Jest requires experimental flags or transform configuration.
@@ -1467,7 +1469,19 @@ Key configuration points:
 
 ### 14.1 Architecture
 
-The director dashboard is a single-page application (SPA) built with React 19 and Vite 6. Routing went through one migration: it originally used hash-based routing via a custom `useHashRoute` hook (to sidestep needing SPA rewrite rules during early development), and now uses **`react-router-dom`'s `BrowserRouter`** — real paths (`/projects`, `/project/:id`, `/casting/:id`, `/round/:id`, `/actors`, `/docs`, `/help`, `/settings`, plus `/` for the persona selector and `/actor` for the actor portal), matched via `<Routes>`/`<Route>` in `App.tsx` and made to work in production by the catch-all rewrite in `vercel.json` (`{ "source": "/(.*)", "destination": "/" }`, see §12.5). The old `useHashRoute` hook has been removed — it was dead code left over from the migration.
+The director dashboard is a single-page application (SPA) built with React 19 and Vite 6. Routing went through one migration: it originally used hash-based routing via a custom `useHashRoute` hook (to sidestep needing SPA rewrite rules during early development), and now uses **`react-router-dom`'s `BrowserRouter`** — real paths (`/projects`, `/project/:id`, `/casting/:id`, `/round/:id`, `/actors`, `/docs`, `/help`, `/settings`, plus `/` for the persona selector and `/actor`, `/actor/settings` for the actor portal), matched via `<Routes>`/`<Route>` in `App.tsx` and made to work in production by the catch-all rewrite in `vercel.json` (`{ "source": "/(.*)", "destination": "/" }`, see §12.5). The old `useHashRoute` hook has been removed — it was dead code left over from the migration.
+
+The actor persona is a second, sibling `<Routes>` tree inside the same `App.tsx`, rendered instead of the director layout when the path is `/actor` or starts with `/actor/`:
+
+```typescript
+<Routes>
+  <Route path="/actor" element={<ActorPortalView />} />
+  <Route path="/actor/settings" element={<ActorSettingsView />} />
+  <Route path="*" element={<Navigate to="/" />} />
+</Routes>
+```
+
+`ActorSettingsView` mirrors the director's `SettingsView` (§14.4) in layout, but not in data source: the director's profile is a local-only `localStorage` convenience (there's nothing to synchronize — no other user ever reads it), while the actor's settings edit the actual `Actor` row shared with the director-facing actor management UI (`ActorModal`, `ActorsView`) — fetched via the (previously missing) `GET /api/actors/:id` and saved through the existing `PUT /api/actors/:id` (`UpdateActorUseCase`). "Which actor" resolves the same way the actor portal itself does: the `VITE_ACTOR_ID` env var (default `'a1'`), since there's still no authentication (§1.2) — the demo has one implicit actor identity per deployment, not a login.
 
 ### 14.2 Routing Strategy
 
@@ -1523,7 +1537,7 @@ Each domain has a corresponding service file in `apps/web/src/services/`:
 | Service | File | Purpose |
 |---------|------|---------|
 | API client | `api.ts` | Shared `get`/`post`/`put`/`del` fetch wrapper |
-| Actor | `actorService.ts` | Fetch/create/update/delete actors via API with local fallback |
+| Actor | `actorService.ts` | Fetch (list/single)/create/update/delete actors via API, with local fallback for list/create/update/delete (not the single-actor fetch used by settings) |
 | Project | `projectService.ts` | Create projects and fetch the dashboard tree, with local fallback |
 | Casting | `castingService.ts` | Create castings, update phase |
 | Round | `roundService.ts` | Create rounds, open/close |
@@ -1580,6 +1594,7 @@ apps/web/src/
 │   ├── RoundDetailView.tsx
 │   ├── ActorsView.tsx
 │   ├── ActorPortalView.tsx
+│   ├── ActorSettingsView.tsx
 │   ├── SettingsView.tsx
 │   ├── DocsView.tsx
 │   ├── HelpView.tsx
@@ -2052,18 +2067,18 @@ The project implements a four-layer testing strategy:
                     │   E2E    │  Playwright (11 tests) + Maestro (6 flows, mobile)
                     │          │  Full browser / device automation
                 ┌───┴──────────┴───┐
-                │  Integration     │  Vitest + Testing Library (96 tests)
+                │  Integration     │  Vitest + Testing Library (101 tests)
                 │  (Web Components)│  Component rendering with mocked services
             ┌───┴──────────────────┴───┐
             │    Infrastructure Tests   │  Vitest (36 tests)
             │    (Zod Schema Validation)│  Schema validation correctness
         ┌───┴──────────────────────────┴───┐
-        │         Unit Tests               │  Vitest (82 tests) + Jest (35 tests)
+        │         Unit Tests               │  Vitest (84 tests) + Jest (35 tests)
         │    (Business Logic + Services)    │  Pure function/class testing
         └──────────────────────────────────┘
 ```
 
-### 19.2 Layer 1: Core Unit Tests (82 tests)
+### 19.2 Layer 1: Core Unit Tests (84 tests)
 
 **Tool:** Vitest with Node environment
 **Location:** `packages/core/__tests__/use-cases/`
@@ -2082,7 +2097,7 @@ class MockActorRepository implements IActorRepository {
 }
 ```
 
-**Test coverage:** All 24 use cases have dedicated test files covering:
+**Test coverage:** All 25 use cases have dedicated test files covering:
 - Happy path (successful execution)
 - Error conditions (not found, invalid state, constraint violations)
 - Edge cases (empty inputs, boundary values)
@@ -2102,7 +2117,7 @@ test('CreateActorSchema rejects invalid email', () => {
 })
 ```
 
-### 19.4 Layer 3: Web Integration Tests (96 tests)
+### 19.4 Layer 3: Web Integration Tests (101 tests)
 
 **Tool:** Vitest + @testing-library/react + jsdom
 **Location:** `apps/web/src/__tests__/components/`, `.../views/`, and `.../services/`
@@ -2176,9 +2191,9 @@ export default defineConfig({
 
 | Command | What It Runs | Approximate Time |
 |---------|-------------|-----------------|
-| `npm run test:core` | 82 core unit tests | ~ 2s |
+| `npm run test:core` | 84 core unit tests | ~ 2s |
 | `npm run test:infra` | 36 infrastructure tests | < 1s |
-| `npm run test:web` | 96 web integration tests | ~ 30s |
+| `npm run test:web` | 101 web integration tests | ~ 30s |
 | `npm run test` | All three above sequentially | ~ 35s |
 | `npm run test:e2e` | 11 Playwright E2E tests | ~ 15s |
 | `npm run test` (from apps/mobile) | 35 mobile tests | ~ 35s |
@@ -2189,13 +2204,13 @@ export default defineConfig({
 
 | Workspace | Tool | Files | Tests | Environment |
 |-----------|------|-------|-------|-------------|
-| packages/core | Vitest | 24 | 82 | Node |
+| packages/core | Vitest | 25 | 84 | Node |
 | packages/infrastructure | Vitest | 1 | 36 | Node |
-| apps/web | Vitest | 19 | 96 | jsdom |
+| apps/web | Vitest | 20 | 101 | jsdom |
 | apps/mobile | Jest | 9 | 35 | Native (jest-expo) |
 | e2e | Playwright | 1 | 11 | Chromium headless |
 | apps/mobile/.maestro | Maestro | 6 flows | — | Real device / simulator |
-| **Total (automated, non-Maestro)** | | **54** | **260** | |
+| **Total (automated, non-Maestro)** | | **56** | **265** | |
 
 ---
 
@@ -2284,8 +2299,8 @@ masterai-tfm/
 │   │   ├── entities/                # 8 entity interfaces
 │   │   ├── repositories/           # 8 repository interfaces
 │   │   ├── services/                # IAIAnalysisService
-│   │   ├── use-cases/               # 24 use case classes
-│   │   └── __tests__/               # 82 tests, 24 files
+│   │   ├── use-cases/               # 25 use case classes
+│   │   └── __tests__/               # 84 tests, 25 files
 │   │
 │   ├── database/                   # @masterai/database
 │   │   ├── package.json
@@ -2303,10 +2318,10 @@ masterai-tfm/
 │       ├── repositories/           # 8 Prisma implementations
 │       └── __tests__/              # 36 tests
 │
-├── api/                             # 27 endpoints, mostly through one router (§12.2)
+├── api/                             # 28 endpoints, mostly through one router (§12.2)
 │   ├── package.json
 │   ├── tsconfig.json
-│   ├── router.ts                   # 26 routes dispatched from one Vercel function
+│   ├── router.ts                   # 27 routes dispatched from one Vercel function
 │   ├── router.mjs                  # esbuild output (gitignored, built at deploy time)
 │   ├── ai/OpenAIAnalysisService.ts # Whisper + GPT-4o-mini adapter
 │   └── cloudinary/sign.ts          # Standalone signed-upload function
@@ -2325,8 +2340,8 @@ masterai-tfm/
 │   │       ├── data/mock.ts        # Fallback/dev seed data
 │   │       ├── services/           # 10 API service modules
 │   │       ├── components/         # ~10 reusable components (modals, grids)
-│   │       ├── views/              # 11 routed views
-│   │       └── __tests__/          # 96 tests, 19 files (incl. service-layer tests)
+│   │       ├── views/              # 12 routed views
+│   │       └── __tests__/          # 101 tests, 20 files (incl. service-layer tests)
 │   │
 │   └── mobile/                     # Actor App
 │       ├── package.json
@@ -2358,37 +2373,38 @@ masterai-tfm/
 
 ## Appendix A: API Endpoint Reference
 
-This appendix gives request/response shapes for the same 27 endpoints listed in §12.4; treat §12.4 as the index and this as the schema detail.
+This appendix gives request/response shapes for the same 28 endpoints listed in §12.4; treat §12.4 as the index and this as the schema detail.
 
 | # | Method | Path | Request Body | Response | Status Codes |
 |---|--------|------|-------------|----------|-------------|
 | 1 | POST | `/api/upload` | multipart, handled by `@vercel/blob`'s `handleUpload` (`clientPayload`: `{fileType, fileSize, fileName}`) | Blob client token payload | 200, 400 |
 | 2 | GET | `/api/actors?search=` | — | `Actor[]` | 200 |
 | 3 | POST | `/api/actors/create` | `{name, email, phone?}` | `Actor` | 201, 400 |
-| 4 | PUT | `/api/actors/:id` | Partial actor fields | `Actor` | 200, 400, 404 |
-| 5 | DELETE | `/api/actors/:id` | — | `{id, deleted: true}` | 200, 404 |
-| 6 | GET | `/api/projects` | — | `Project[]` | 200 |
-| 7 | POST | `/api/projects/create` | `{directorId (uuid), title, description?}` | `Project` | 201, 400 |
-| 8 | POST | `/api/projects/close` | `{projectId, directorId}` | `Project` | 200, 400 |
-| 9 | PUT | `/api/projects/:id/status` | `{status: 'draft'\|'active'\|'closed'}` | `Project` | 200, 400, 404 |
-| 10 | GET | `/api/dashboard` | — | `Project[]` (nested castings → rounds → submissions) | 200 |
-| 11 | GET | `/api/castings?actorId=` | — | `Casting[]` (open only, with current round + that actor's submission) | 200 |
-| 12 | POST | `/api/castings/create` | `{projectId, roleName, description?, requirements?}` | `Casting` | 201, 400 |
-| 13 | POST | `/api/castings/close` | `{castingId}` | `Casting` | 200, 400 |
-| 14 | PUT | `/api/castings/:id/phase` | `{activePhase}` | `Casting` | 200, 400, 404 |
-| 15 | POST | `/api/rounds/create` | `{castingId, name, description?, deadline?, order}` | `Round` | 201, 400 |
-| 16 | POST | `/api/rounds/open` | `{roundId (uuid)}` | `Round` | 200, 400 |
-| 17 | POST | `/api/rounds/close` | `{roundId (uuid)}` | `Round` | 200, 400 |
-| 18 | POST | `/api/rounds/attachment` | `{roundId, fileName, fileType, url, fileSize}` | `Attachment` | 201, 400 |
-| 19 | GET | `/api/rounds/attachments?roundId=` | — | `Attachment[]` | 200 |
-| 20 | DELETE | `/api/rounds/attachment/:id` | — | `{id, removed: true}` | 200, 404 |
-| 21 | POST | `/api/submissions` | `{castingId, actorId, videoUrl, notes?}` | `Submission` | 201, 400 |
-| 22 | POST | `/api/submissions/upload` | `{roundId (uuid), actorId (uuid), videoData (base64), fileName, notes?}` | `Submission` | 201, 400 |
-| 23 | POST | `/api/submissions/review` | `{submissionId (uuid), status: 'reviewed'\|'shortlisted'\|'rejected', feedback?}` | `Submission` | 200, 400 |
-| 24 | POST | `/api/submissions/comment` | `{submissionId (uuid), authorName, content}` | `Comment` | 201, 400 |
-| 25 | GET | `/api/submissions/comments?submissionId=` | — | `Comment[]` | 200 |
-| 26 | POST | `/api/analyze` | `{submissionId}` | `Submission` (with `transcript`, `aiScore`, `aiFeedback`) | 200, 400, 404, 429, 502, 503 |
-| 27 | GET | `/api/cloudinary/sign` | — | `{signature, timestamp, folder, apiKey, cloudName}` | 200, 405, 500 |
+| 4 | GET | `/api/actors/:id` | — | `Actor` | 200, 404 |
+| 5 | PUT | `/api/actors/:id` | Partial actor fields | `Actor` | 200, 400, 404 |
+| 6 | DELETE | `/api/actors/:id` | — | `{id, deleted: true}` | 200, 404 |
+| 7 | GET | `/api/projects` | — | `Project[]` | 200 |
+| 8 | POST | `/api/projects/create` | `{directorId (uuid), title, description?}` | `Project` | 201, 400 |
+| 9 | POST | `/api/projects/close` | `{projectId, directorId}` | `Project` | 200, 400 |
+| 10 | PUT | `/api/projects/:id/status` | `{status: 'draft'\|'active'\|'closed'}` | `Project` | 200, 400, 404 |
+| 11 | GET | `/api/dashboard` | — | `Project[]` (nested castings → rounds → submissions) | 200 |
+| 12 | GET | `/api/castings?actorId=` | — | `Casting[]` (open only, with current round + that actor's submission) | 200 |
+| 13 | POST | `/api/castings/create` | `{projectId, roleName, description?, requirements?}` | `Casting` | 201, 400 |
+| 14 | POST | `/api/castings/close` | `{castingId}` | `Casting` | 200, 400 |
+| 15 | PUT | `/api/castings/:id/phase` | `{activePhase}` | `Casting` | 200, 400, 404 |
+| 16 | POST | `/api/rounds/create` | `{castingId, name, description?, deadline?, order}` | `Round` | 201, 400 |
+| 17 | POST | `/api/rounds/open` | `{roundId (uuid)}` | `Round` | 200, 400 |
+| 18 | POST | `/api/rounds/close` | `{roundId (uuid)}` | `Round` | 200, 400 |
+| 19 | POST | `/api/rounds/attachment` | `{roundId, fileName, fileType, url, fileSize}` | `Attachment` | 201, 400 |
+| 20 | GET | `/api/rounds/attachments?roundId=` | — | `Attachment[]` | 200 |
+| 21 | DELETE | `/api/rounds/attachment/:id` | — | `{id, removed: true}` | 200, 404 |
+| 22 | POST | `/api/submissions` | `{castingId, actorId, videoUrl, notes?}` | `Submission` | 201, 400 |
+| 23 | POST | `/api/submissions/upload` | `{roundId (uuid), actorId (uuid), videoData (base64), fileName, notes?}` | `Submission` | 201, 400 |
+| 24 | POST | `/api/submissions/review` | `{submissionId (uuid), status: 'reviewed'\|'shortlisted'\|'rejected', feedback?}` | `Submission` | 200, 400 |
+| 25 | POST | `/api/submissions/comment` | `{submissionId (uuid), authorName, content}` | `Comment` | 201, 400 |
+| 26 | GET | `/api/submissions/comments?submissionId=` | — | `Comment[]` | 200 |
+| 27 | POST | `/api/analyze` | `{submissionId}` | `Submission` (with `transcript`, `aiScore`, `aiFeedback`) | 200, 400, 404, 429, 502, 503 |
+| 28 | GET | `/api/cloudinary/sign` | — | `{signature, timestamp, folder, apiKey, cloudName}` | 200, 405, 500 |
 
 ---
 
@@ -2413,7 +2429,7 @@ This appendix gives request/response shapes for the same 27 endpoints listed in 
 │         │            │             │     │  - Attachment        │ │
 │         │            │             │     │                      │ │
 │         │            │  ┌──────────┤     │  Use Cases:          │ │
-│         │            │  │   api/   │     │  - 24 total          │ │
+│         │            │  │   api/   │     │  - 25 total          │ │
 │         └───────────>│  │ Vercel   │     │                      │ │
 │                      │  │ Serverless│    │  Repo Interfaces:    │ │
 │                      │  └────┬─────┘     │  - 8 total           │ │
