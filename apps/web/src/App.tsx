@@ -13,6 +13,7 @@ import { CastingDetailView } from './views/CastingDetailView'
 import { RoundDetailView } from './views/RoundDetailView'
 import { PersonaSelector } from './views/PersonaSelector'
 import { ActorPortalView } from './views/ActorPortalView'
+import { ActorSettingsView } from './views/ActorSettingsView'
 import { createProject, fetchDashboard } from './services/projectService'
 import type { CreateProjectInput } from './services/projectService'
 import { createCasting } from './services/castingService'
@@ -171,6 +172,11 @@ const navItems = [
   { path: '/settings', label: 'Settings', icon: '⚙️', match: ['/settings'] },
 ]
 
+const actorNavItems = [
+  { path: '/actor', label: 'Castings', icon: '🎬' },
+  { path: '/actor/settings', label: 'Settings', icon: '⚙️' },
+]
+
 function useActiveRoute() {
   return useLocation().pathname
 }
@@ -226,6 +232,15 @@ export default function App() {
           <aside className="sidebar glass">
             <div className="logo">MasterAI</div>
             <div style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-tertiary)' }}>🎭 Actor</div>
+            {actorNavItems.map(item => (
+              <button
+                key={item.path}
+                className={`nav-item${path === item.path ? ' active' : ''}`}
+                onClick={() => navigate(item.path)}
+              >
+                <span>{item.icon}</span> {item.label}
+              </button>
+            ))}
           </aside>
           <main className="main-area">
             <header className="topbar glass">
@@ -239,6 +254,7 @@ export default function App() {
             <div className="content">
               <Routes>
                 <Route path="/actor" element={<ActorPortalView />} />
+                <Route path="/actor/settings" element={<ActorSettingsView />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

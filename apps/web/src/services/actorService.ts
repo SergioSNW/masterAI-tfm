@@ -48,6 +48,10 @@ export async function fetchActors(search?: string): Promise<ActorDTO[]> {
   return data
 }
 
+export async function fetchActor(id: string): Promise<ActorDTO> {
+  return get<ActorDTO>(`/actors/${id}`)
+}
+
 export async function createActor(input: CreateActorInput): Promise<ActorDTO> {
   const newActor: ActorDTO = {
     id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,

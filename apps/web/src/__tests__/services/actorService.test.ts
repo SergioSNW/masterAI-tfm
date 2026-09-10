@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import * as api from '../../services/api'
-import { fetchActors, createActor, updateActor, deleteActor } from '../../services/actorService'
+import { fetchActors, fetchActor, createActor, updateActor, deleteActor } from '../../services/actorService'
 import type { ActorDTO } from '../../services/actorService'
 
 vi.mock('../../services/api', () => ({
@@ -31,6 +31,21 @@ describe('actorService', () => {
     vi.mocked(api.get).mockResolvedValue([])
     await fetchActors()
     expect(api.get).toHaveBeenCalledWith('/actors')
+  })
+
+  it('fetchActor requests a single actor by id', async () => {
+    vi.mocked(api.get).mockResolvedValue(serverActor)
+
+    const result = await fetchActor('a1')
+
+    expect(api.get).toHaveBeenCalledWith('/actors/a1')
+    expect(result).toEqual(serverActor)
+  })
+
+  it('fetchActor propagates a rejection when the actor is not found', async () => {
+    vi.mocked(api.get).mockRejectedValue(new Error('Actor not found'))
+
+    await expect(fetchActor('missing')).rejects.toThrow('Actor not found')
   })
 
   it('createActor returns the server-created actor on success', async () => {

@@ -24,6 +24,7 @@ export type { CloseRoundDTO } from './rounds/CloseRoundUseCase.js'
 
 export { CreateActorUseCase } from './actors/CreateActorUseCase.js'
 export type { CreateActorDTO } from './actors/CreateActorUseCase.js'
+export { GetActorUseCase } from './actors/GetActorUseCase.js'
 export { ListActorsUseCase } from './actors/ListActorsUseCase.js'
 export type { ListActorsDTO } from './actors/ListActorsUseCase.js'
 export { UpdateActorUseCase } from './actors/UpdateActorUseCase.js'

@@ -32,6 +32,7 @@ import {
 } from '@masterai/infrastructure'
 import {
   CreateActorUseCase,
+  GetActorUseCase,
   UpdateActorUseCase,
   DeleteActorUseCase,
   ListActorsUseCase,
@@ -100,6 +101,7 @@ const routes: Route[] = [
 
   defineRoute('GET', '/api/actors', listActors),
   defineRoute('POST', '/api/actors/create', createActor),
+  defineRoute('GET', '/api/actors/:id', getActor),
   defineRoute('PUT', '/api/actors/:id', updateActor),
   defineRoute('DELETE', '/api/actors/:id', deleteActor),
 
@@ -191,6 +193,13 @@ async function createActor(req: VercelRequest, res: VercelResponse) {
   const result = await useCase.execute(parsed.data)
   if (!result.ok) return res.status(409).json({ error: result.error.message })
   return res.status(201).json(result.data)
+}
+
+async function getActor(req: VercelRequest, res: VercelResponse, params: Record<string, string>) {
+  const useCase = new GetActorUseCase(new PrismaActorRepository())
+  const result = await useCase.execute(params.id)
+  if (!result.ok) return res.status(404).json({ error: result.error.message })
+  return res.status(200).json(result.data)
 }
 
 async function listProjects(req: VercelRequest, res: VercelResponse) {
