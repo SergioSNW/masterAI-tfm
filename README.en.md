@@ -23,7 +23,7 @@ Two front ends, one API, one database:
 | | |
 |---|---|
 | **Director dashboard** | React 19 + Vite SPA, deployed on Vercel |
-| **Actor app** | React Native + Expo (SDK 54) — runs natively on iOS/Android and compiles to web from the same codebase |
+| **Actor app** | React Native + Expo (SDK 54) — runs natively on iOS/Android. Camera recording is mobile-only; the web portal for actors only uploads a video file |
 | **Backend** | Vercel Serverless Functions — a Clean Architecture core with no framework dependencies |
 | **Database** | Neon.tech (serverless PostgreSQL) via Prisma |
 | **Video/files** | Cloudinary (video) and Vercel Blob (documents), never through the database |
@@ -56,7 +56,7 @@ Alternatively, run it yourself:
 
 ```bash
 npm run dev:mobile        # scan the terminal QR with Expo Go (or your dev client, if you've built one)
-npm run dev:mobile:web    # opens in a browser, no phone needed
+npm run dev:mobile:web    # opens in a browser, no phone needed (camera recording is unavailable on web)
 ```
 
 ---
@@ -139,7 +139,7 @@ npm run dev:mobile:web  # Expo, opens in a browser
 npm run test          # core + infrastructure + web unit/integration tests
 npm run test:core      # 84 tests — use case business logic
 npm run test:infra      # 36 tests — Zod schema validation
-npm run test:web         # 101 tests — service, component, and context tests
+npm run test:web         # 109 tests — service, component, and context tests
 npm run test:e2e          # 11 Playwright browser tests (needs the web app running)
 npm run test:all           # everything above
 npm test -w apps/mobile     # 35 tests

@@ -4,7 +4,7 @@
 > Plataforma multiplataforma de casting: un panel web para directores de casting y una app móvil para actores, sobre un único backend serverless.
 
 🌐 **Proyecto desplegado:** [master-ai-tfm.vercel.app](https://master-ai-tfm.vercel.app)
-📊 **Presentación (slides):** _pendiente de publicar — enlace al final de este README_
+📊 **Presentación (slides):** [Google Slides](https://docs.google.com/presentation/d/1mfqfepsj95VlxQV5p2LBVkq21ZEBvO5ZHlpkQT4bu78/edit)
 📘 **Referencia de arquitectura completa:** [ARCHITECTURE_TEXTBOOK.md](./ARCHITECTURE_TEXTBOOK.md) (en inglés)
 🇬🇧 **English version of this README:** [README.en.md](./README.en.md)
 
@@ -38,7 +38,7 @@ Son dos clientes que comparten una única API y una única base de datos:
 | Cliente | Público | Tecnología |
 |---|---|---|
 | **Panel web** | Directores de casting (y portal web para actores) | React 19 + Vite, desplegado en Vercel |
-| **App móvil** | Actores | React Native + Expo (SDK 54), Android/iOS/web desde el mismo código |
+| **App móvil** | Actores | React Native + Expo (SDK 54) para Android e iOS. La grabación con cámara solo existe en la app móvil; en la web el actor sube un archivo de vídeo |
 
 El backend está construido con **Arquitectura Limpia** (Entities → Use Cases → Repository Interfaces → Adapters): la lógica de negocio vive en un paquete TypeScript sin dependencias externas, y Prisma, Zod, Vercel, Cloudinary y OpenAI quedan aislados en capas exteriores, sustituibles sin tocar el núcleo.
 
@@ -207,7 +207,7 @@ apps/mobile ┘                     (Prisma + Zod)          (sin dependencias)
 - **Arquitectura limpia** con núcleo sin dependencias y un catálogo de 28 endpoints validados con Zod.
 - **Subida directa de archivos** (Cloudinary / Vercel Blob): los bytes nunca pasan por la función serverless ni por la base de datos.
 - Errores tipados de la IA (límite de peticiones, fallo de autenticación, servicio caído) traducidos a códigos HTTP coherentes.
-- **265 pruebas automatizadas** + 6 flujos E2E de móvil con Maestro (ver [§7](#7-pruebas)).
+- **275 pruebas automatizadas** + 6 flujos E2E de móvil con Maestro (ver [§7](#7-pruebas)).
 - Sin autenticación por decisión de alcance (ver nota en [§1](#1-descripción-general)).
 
 ---
@@ -226,7 +226,9 @@ Escanea para abrir el panel web:
 
 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fmaster-ai-tfm.vercel.app" alt="QR al panel web desplegado" width="200" height="200" />
 
-En la pantalla inicial elige **Director** o **Actor**.
+En la pantalla inicial elige **Director** o **Actor**. No hay login (decisión de alcance), así que **no se necesita usuario ni contraseña de prueba**.
+
+> En la web, el portal del actor **solo sube archivos de vídeo** (hasta 100 MB). Grabar con la cámara es exclusivo de la app móvil (Expo).
 
 **App móvil.** El APK de Android se genera con EAS Build; los artefactos caducan a los ~30 días, por lo que se regenera antes de cada demo:
 
@@ -235,7 +237,7 @@ cd apps/mobile
 eas build --profile preview --platform android
 ```
 
-Para iOS, las builds internas solo se instalan en dispositivos cuyo UDID esté registrado de antemano, así que una distribución abierta requeriría TestFlight (Apple Developer Program). La misma app puede ejecutarse en cualquier iPhone con Expo Go (`npm run dev:mobile`) o en el navegador (`npm run dev:mobile:web`).
+Para iOS, las builds internas solo se instalan en dispositivos cuyo UDID esté registrado de antemano, así que una distribución abierta requeriría TestFlight (Apple Developer Program). La misma app puede ejecutarse en cualquier iPhone con Expo Go (`npm run dev:mobile`) o en el navegador (`npm run dev:mobile:web`), aunque la vista web de Expo no puede grabar con la cámara (sí previsualiza).
 
 ---
 
@@ -245,7 +247,7 @@ Para iOS, las builds internas solo se instalan en dispositivos cuyo UDID esté r
 npm run test               # core + infrastructure + web
 npm run test:core          # 84 pruebas — casos de uso (los 25 tienen su archivo)
 npm run test:infra         # 36 pruebas — esquemas Zod
-npm run test:web           # 101 pruebas — servicios, componentes y contextos
+npm run test:web           # 109 pruebas — servicios, componentes y contextos
 npm run test:e2e           # 11 pruebas Playwright (requieren la web en marcha)
 npm test -w apps/mobile    # 35 pruebas — servicios y componentes móviles
 npm run maestro:test       # 6 flujos E2E móviles (requieren simulador o dispositivo)
@@ -257,6 +259,6 @@ Detalle de la estrategia de testing en el [§19 del textbook](./ARCHITECTURE_TEX
 
 ## 8. Presentación
 
-- **Slides:** _pendiente de publicar_
+- **Slides:** [Google Slides](https://docs.google.com/presentation/d/1mfqfepsj95VlxQV5p2LBVkq21ZEBvO5ZHlpkQT4bu78/edit)
 - **Repositorio:** [github.com/SergioSNW/masterAI-tfm](https://github.com/SergioSNW/masterAI-tfm)
 - **Documentación técnica ampliada:** [ARCHITECTURE_TEXTBOOK.md](./ARCHITECTURE_TEXTBOOK.md)

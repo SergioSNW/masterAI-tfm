@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom'
 import { Toaster, toast } from 'sonner'
 import { getProfile } from './services/profileService'
@@ -14,6 +14,7 @@ import { RoundDetailView } from './views/RoundDetailView'
 import { PersonaSelector } from './views/PersonaSelector'
 import { ActorPortalView } from './views/ActorPortalView'
 import { ActorSettingsView } from './views/ActorSettingsView'
+import { Sidebar, MenuButton } from './components/Sidebar'
 import { createProject, fetchDashboard } from './services/projectService'
 import type { CreateProjectInput } from './services/projectService'
 import { createCasting } from './services/castingService'
@@ -189,6 +190,10 @@ export default function App() {
   const isActor = path === '/actor' || path.startsWith('/actor/')
   const [projects, setProjects] = useState<Project[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+
+  useEffect(() => { setMenuOpen(false) }, [path])
 
   useEffect(() => {
     fetchDashboard()
@@ -229,22 +234,24 @@ export default function App() {
         />
       ) : isActor ? (
         <>
-          <aside className="sidebar glass">
-            <div className="logo">MasterAI</div>
+          <Sidebar open={menuOpen} onClose={closeMenu}>
             <div style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-tertiary)' }}>🎭 Actor</div>
             {actorNavItems.map(item => (
               <button
                 key={item.path}
                 className={`nav-item${path === item.path ? ' active' : ''}`}
-                onClick={() => navigate(item.path)}
+                onClick={() => { navigate(item.path); closeMenu() }}
               >
                 <span>{item.icon}</span> {item.label}
               </button>
             ))}
-          </aside>
+          </Sidebar>
           <main className="main-area">
             <header className="topbar glass">
-              <h1 className="topbar-title">Actor Portal</h1>
+              <div className="topbar-left">
+                <MenuButton open={menuOpen} onClick={() => setMenuOpen(true)} />
+                <h1 className="topbar-title">Actor Portal</h1>
+              </div>
               <div className="topbar-right">
                 <button className="btn btn-ghost switch-role-btn" onClick={() => navigate('/')}>
                   Switch Role
@@ -262,27 +269,29 @@ export default function App() {
         </>
       ) : (
         <>
-          <aside className="sidebar glass">
-            <div className="logo">MasterAI</div>
+          <Sidebar open={menuOpen} onClose={closeMenu}>
             {navItems.map(item => (
               <button
                 key={item.path}
                 className={`nav-item${isActive(item.match) ? ' active' : ''}`}
-                onClick={() => navigate(item.path)}
+                onClick={() => { navigate(item.path); closeMenu() }}
               >
                 <span>{item.icon}</span> {item.label}
               </button>
             ))}
-          </aside>
+          </Sidebar>
 
           <main className="main-area">
             <header className="topbar glass">
-              <h1 className="topbar-title">Director Dashboard</h1>
+              <div className="topbar-left">
+                <MenuButton open={menuOpen} onClick={() => setMenuOpen(true)} />
+                <h1 className="topbar-title">Director Dashboard</h1>
+              </div>
               <div className="topbar-right">
                 <button className="btn btn-ghost switch-role-btn" onClick={() => navigate('/')}>
                   Switch Role
                 </button>
-                <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{profile.name}</span>
+                <span className="topbar-name">{profile.name}</span>
                 <div className="avatar">{profile.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
               </div>
             </header>

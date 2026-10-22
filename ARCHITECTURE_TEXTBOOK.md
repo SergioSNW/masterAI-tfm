@@ -1416,7 +1416,7 @@ Key configuration points:
 
 - `packages/core` (84 tests, 25 files) — pure business logic tests, one file per use case
 - `packages/infrastructure` (36 tests, 1 file) — Zod schema validation tests
-- `apps/web` (101 tests, 20 files) — service-layer, component, and context tests with Testing Library
+- `apps/web` (109 tests, 21 files) — service-layer, component, and context tests with Testing Library
 
 **Why over Jest:**
 - **ESM support:** Vitest has native ESM support without configuration. Jest requires experimental flags or transform configuration.
@@ -1815,6 +1815,10 @@ The visual design is inspired by Apple's visionOS design language, characterized
 }
 ```
 
+#### Responsive sidebar (web)
+
+Below 768 px the fixed sidebar becomes an off-canvas drawer (`components/Sidebar.tsx`): closed by default, opened from a hamburger `MenuButton` in the topbar, closed with the ✕ button next to the logo, a tap on the backdrop, the Escape key, or any navigation tap. On desktop the same markup renders as the fixed 240 px column, so there is one component for both layouts. The drawer only animates `transform`/`opacity`, uses `visibility` so closed links leave the tab order, and honours `prefers-reduced-motion`. `App.tsx` owns the `menuOpen` state and resets it whenever the route changes.
+
 ### 16.4 Glassmorphism Pattern (Mobile)
 
 ```typescript
@@ -2067,7 +2071,7 @@ The project implements a four-layer testing strategy:
                     │   E2E    │  Playwright (11 tests) + Maestro (6 flows, mobile)
                     │          │  Full browser / device automation
                 ┌───┴──────────┴───┐
-                │  Integration     │  Vitest + Testing Library (101 tests)
+                │  Integration     │  Vitest + Testing Library (109 tests)
                 │  (Web Components)│  Component rendering with mocked services
             ┌───┴──────────────────┴───┐
             │    Infrastructure Tests   │  Vitest (36 tests)
@@ -2117,7 +2121,7 @@ test('CreateActorSchema rejects invalid email', () => {
 })
 ```
 
-### 19.4 Layer 3: Web Integration Tests (101 tests)
+### 19.4 Layer 3: Web Integration Tests (109 tests)
 
 **Tool:** Vitest + @testing-library/react + jsdom
 **Location:** `apps/web/src/__tests__/components/`, `.../views/`, and `.../services/`
@@ -2193,7 +2197,7 @@ export default defineConfig({
 |---------|-------------|-----------------|
 | `npm run test:core` | 84 core unit tests | ~ 2s |
 | `npm run test:infra` | 36 infrastructure tests | < 1s |
-| `npm run test:web` | 101 web integration tests | ~ 30s |
+| `npm run test:web` | 109 web integration tests | ~ 30s |
 | `npm run test` | All three above sequentially | ~ 35s |
 | `npm run test:e2e` | 11 Playwright E2E tests | ~ 15s |
 | `npm run test` (from apps/mobile) | 35 mobile tests | ~ 35s |
@@ -2206,11 +2210,11 @@ export default defineConfig({
 |-----------|------|-------|-------|-------------|
 | packages/core | Vitest | 25 | 84 | Node |
 | packages/infrastructure | Vitest | 1 | 36 | Node |
-| apps/web | Vitest | 20 | 101 | jsdom |
+| apps/web | Vitest | 21 | 109 | jsdom |
 | apps/mobile | Jest | 9 | 35 | Native (jest-expo) |
 | e2e | Playwright | 1 | 11 | Chromium headless |
 | apps/mobile/.maestro | Maestro | 6 flows | — | Real device / simulator |
-| **Total (automated, non-Maestro)** | | **56** | **265** | |
+| **Total (automated, non-Maestro)** | | **57** | **275** | |
 
 ---
 
@@ -2341,7 +2345,7 @@ masterai-tfm/
 │   │       ├── services/           # 10 API service modules
 │   │       ├── components/         # ~10 reusable components (modals, grids)
 │   │       ├── views/              # 12 routed views
-│   │       └── __tests__/          # 101 tests, 20 files (incl. service-layer tests)
+│   │       └── __tests__/          # 109 tests, 21 files (incl. service-layer tests)
 │   │
 │   └── mobile/                     # Actor App
 │       ├── package.json

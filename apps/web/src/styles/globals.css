@@ -1166,3 +1166,92 @@ select.edit-input option {
   align-items: center;
   gap: 8px;
 }
+
+/* ── Collapsible sidebar (mobile) ── */
+.sidebar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.sidebar-close,
+.menu-btn,
+.sidebar-backdrop { display: none; }
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.topbar-name { font-size: 14px; color: var(--text-secondary); }
+
+.menu-btn,
+.sidebar-close {
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.menu-btn:hover,
+.sidebar-close:hover { background: var(--glass-bg-hover); border-color: var(--glass-border-hover); }
+.menu-btn { flex-direction: column; gap: 4px; }
+.menu-btn span { display: block; width: 18px; height: 2px; border-radius: 1px; background: currentColor; }
+.sidebar-close { font-size: 16px; margin-top: -4px; }
+
+@media (max-width: 768px) {
+  .app-layout { height: 100dvh; }
+
+  .menu-btn,
+  .sidebar-close { display: flex; }
+
+  .sidebar.glass {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(280px, 82vw);
+    background: var(--bg-secondary);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform var(--transition), visibility 0s linear 250ms;
+    z-index: 30;
+    box-shadow: none;
+    overflow-y: auto;
+  }
+  .sidebar.glass.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform var(--transition);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+  }
+  .sidebar-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .topbar { padding: 12px 16px; gap: 12px; }
+  .topbar-title { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-right { gap: 10px; flex-shrink: 0; }
+  .topbar-name { display: none; }
+  .switch-role-btn { white-space: nowrap; padding: 8px 12px; font-size: 13px; }
+  .content { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar.glass, .sidebar-backdrop { transition: none; }
+}
